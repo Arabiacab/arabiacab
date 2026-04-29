@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.arabiacab.com
+
+# Sitemaps
+Sitemap: https://www.arabiacab.com/server-sitemap.xml
