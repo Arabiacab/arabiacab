@@ -24,7 +24,8 @@ export function BookingWidget({ className }: { className?: string }) {
     toCity: 'Jeddah',
     serviceType: 'Airport → Makkah Hotel',
     name: '',
-    phone: ''
+    phone: '',
+    email: ''
   });
 
   const handleChange = (e: any) => {
@@ -42,6 +43,37 @@ export function BookingWidget({ className }: { className?: string }) {
     if (tripType === 'airport') return 250;
     if (tripType === 'hajj') return 600;
     return 150;
+  };
+
+  const getServiceSummary = () => {
+    if (tripType === 'city') return `${formData.pickup} → ${formData.drop}`;
+    if (tripType === 'airport') return `${formData.airportDir === 'from' ? 'From' : 'To'} ${formData.airport}${formData.flightNo ? ` (Flight: ${formData.flightNo})` : ''}`;
+    if (tripType === 'intercity') return `${formData.fromCity} → ${formData.toCity}`;
+    if (tripType === 'hajj') return formData.serviceType;
+    return '';
+  };
+
+  const sendBookingEmails = async () => {
+    if (!formData.email) return;
+    try {
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          date: formData.date,
+          serviceType: getServiceSummary(),
+          passengers: formData.passengers,
+          carType: formData.carType,
+          tripType: tripType.toUpperCase(),
+          extraDetails: formData.pickup || '',
+        }),
+      });
+    } catch {
+      // Email failure is silent — booking continues normally
+    }
   };
 
   const generateWhatsAppMessage = () => {
@@ -68,6 +100,7 @@ export function BookingWidget({ className }: { className?: string }) {
     msg += `👤 Name: ${formData.name}\n📞 Phone: ${formData.phone}`;
 
     const encoded = encodeURIComponent(msg);
+    sendBookingEmails();
     window.open(`https://wa.me/966XXXXXXXXX?text=${encoded}`, '_blank');
   };
 
@@ -223,7 +256,11 @@ export function BookingWidget({ className }: { className?: string }) {
               <label className="text-xs text-gray-400 uppercase tracking-wider">Your Name</label>
               <input type="text" name="name" onChange={handleChange} placeholder="Full Name" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none" />
             </div>
-            <div className="flex flex-col gap-2 lg:col-span-2">
+            <div className="flex flex-col gap-2">
+              <label className="text-xs text-gray-400 uppercase tracking-wider">Email Address</label>
+              <input type="email" name="email" onChange={handleChange} placeholder="your@email.com" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none" />
+            </div>
+            <div className="flex flex-col gap-2">
               <label className="text-xs text-gray-400 uppercase tracking-wider">WhatsApp Number</label>
               <div className="flex">
                 <span className="bg-[#0A0A0A] border border-[#333333] border-r-0 rounded-l-lg py-3 px-4 text-gray-400 text-sm flex items-center">+966</span>
