@@ -56,7 +56,7 @@ export function BookingWidget({ className }: { className?: string }) {
   const saveBooking = async () => {
     try {
       const [pickup_location, dropoff_location] = (() => {
-        if (tripType === 'city')      return [formData.pickup, formData.drop];
+        if (tripType === 'city')      return [formData.pickup || 'TBD', formData.drop || 'TBD'];
         if (tripType === 'airport')   return formData.airportDir === 'from'
           ? [formData.airport, formData.pickup || 'City']
           : [formData.pickup || 'City', formData.airport];
@@ -74,15 +74,19 @@ export function BookingWidget({ className }: { className?: string }) {
         ? [formData.date.split('T')[0], formData.date.split('T')[1]?.slice(0, 5) ?? '00:00']
         : [new Date().toISOString().split('T')[0], '00:00'];
 
-      await fetch('/api/bookings', {
+      const phone = formData.phone
+        ? `+966${formData.phone.replace(/^\+966/, '')}`
+        : '+966000000000';
+
+      const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customer_name:    formData.name || 'Guest',
-          customer_phone:   `+966${formData.phone}`,
+          customer_phone:   phone,
           customer_email:   formData.email || undefined,
-          pickup_location:  pickup_location || 'TBD',
-          dropoff_location: dropoff_location || 'TBD',
+          pickup_location,
+          dropoff_location,
           pickup_date,
           pickup_time,
           service_type:     serviceMap[tripType] ?? 'standard',
@@ -92,8 +96,13 @@ export function BookingWidget({ className }: { className?: string }) {
           notes:            `Vehicle: ${formData.carType}${formData.flightNo ? ` | Flight: ${formData.flightNo}` : ''}`,
         }),
       });
-    } catch {
-      // silent — WhatsApp still opens
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error('[saveBooking] failed:', res.status, err);
+      }
+    } catch (err) {
+      console.error('[saveBooking] error:', err);
     }
   };
 

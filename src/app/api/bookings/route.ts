@@ -19,13 +19,13 @@ function checkRateLimit(ip: string): boolean {
 }
 
 const createSchema = z.object({
-  customer_name:    z.string().min(2).max(100),
-  customer_phone:   z.string().min(9).max(20),
+  customer_name:    z.string().min(1).max(100).default('Guest'),
+  customer_phone:   z.string().min(1).max(30),
   customer_email:   z.string().email().optional().or(z.literal('')),
-  pickup_location:  z.string().min(3).max(300),
-  dropoff_location: z.string().min(3).max(300),
-  pickup_date:      z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  pickup_time:      z.string().regex(/^\d{2}:\d{2}$/),
+  pickup_location:  z.string().min(1).max(300).default('TBD'),
+  dropoff_location: z.string().min(1).max(300).default('TBD'),
+  pickup_date:      z.string().regex(/^\d{4}-\d{2}-\d{2}$/).default(() => new Date().toISOString().split('T')[0]),
+  pickup_time:      z.string().regex(/^\d{2}:\d{2}$/).default('00:00'),
   service_type:     z.enum(['standard', 'airport', 'tour', 'rental']).default('standard'),
   passengers:       z.number().int().min(1).max(20).default(1),
   payment_method:   z.enum(['cash', 'online']).default('cash'),
@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
+    console.error('[bookings] Validation failed:', JSON.stringify(parsed.error.flatten()));
     return NextResponse.json({ success: false, error: 'Validation failed', details: parsed.error.flatten() }, { status: 422 });
   }
 
