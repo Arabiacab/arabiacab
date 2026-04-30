@@ -1,0 +1,52 @@
+[
+  {
+    "id": "c1000000-0000-0000-0000-000000000001",
+    "name": "Mohammed Al-Rashidi",
+    "phone": "+966501234567",
+    "email": "m.rashidi@gmail.com",
+    "total_bookings": 8,
+    "total_spent": 960,
+    "is_vip": true,
+    "created_at": "2024-01-15T08:00:00Z"
+  },
+  {
+    "id": "c2000000-0000-0000-0000-000000000002",
+    "name": "Fatima Al-Zahrani",
+    "phone": "+966557891234",
+    "email": "fatima.z@hotmail.com",
+    "total_bookings": 3,
+    "total_spent": 135,
+    "is_vip": false,
+    "created_at": "2024-02-20T10:00:00Z"
+  },
+  {
+    "id": "c3000000-0000-0000-0000-000000000003",
+    "name": "Abdullah Al-Ghamdi",
+    "phone": "+966509876543",
+    "email": null,
+    "total_bookings": 1,
+    "total_spent": 0,
+    "is_vip": false,
+    "created_at": "2024-04-30T14:20:00Z"
+  },
+  {
+    "id": "c4000000-0000-0000-0000-000000000004",
+    "name": "Omar Al-Dossari",
+    "phone": "+966543219876",
+    "email": "omar.dossari@company.sa",
+    "total_bookings": 15,
+    "total_spent": 4200,
+    "is_vip": true,
+    "created_at": "2023-11-01T09:00:00Z"
+  },
+  {
+    "id": "c5000000-0000-0000-0000-000000000005",
+    "name": "Nora Al-Mutairi",
+    "phone": "+966512345678",
+    "email": "nora.m@gmail.com",
+    "total_bookings": 2,
+    "total_spent": 0,
+    "is_vip": false,
+    "created_at": "2024-03-10T12:00:00Z"
+  }
+]

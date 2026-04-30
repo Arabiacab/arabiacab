@@ -53,26 +53,47 @@ export function BookingWidget({ className }: { className?: string }) {
     return '';
   };
 
-  const sendBookingEmails = async () => {
-    if (!formData.email) return;
+  const saveBooking = async () => {
     try {
-      await fetch('/api/send-email', {
+      const [pickup_location, dropoff_location] = (() => {
+        if (tripType === 'city')      return [formData.pickup, formData.drop];
+        if (tripType === 'airport')   return formData.airportDir === 'from'
+          ? [formData.airport, formData.pickup || 'City']
+          : [formData.pickup || 'City', formData.airport];
+        if (tripType === 'intercity') return [formData.fromCity, formData.toCity];
+        return [formData.serviceType, formData.pickup || 'Hotel'];
+      })();
+
+      const serviceMap: Record<string, string> = {
+        city: 'standard', airport: 'airport', intercity: 'standard', hajj: 'tour',
+      };
+
+      const passengersNum = parseInt(formData.passengers) || 1;
+
+      const [pickup_date, pickup_time] = formData.date
+        ? [formData.date.split('T')[0], formData.date.split('T')[1]?.slice(0, 5) ?? '00:00']
+        : [new Date().toISOString().split('T')[0], '00:00'];
+
+      await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          date: formData.date,
-          serviceType: getServiceSummary(),
-          passengers: formData.passengers,
-          carType: formData.carType,
-          tripType: tripType.toUpperCase(),
-          extraDetails: formData.pickup || '',
+          customer_name:    formData.name || 'Guest',
+          customer_phone:   `+966${formData.phone}`,
+          customer_email:   formData.email || undefined,
+          pickup_location:  pickup_location || 'TBD',
+          dropoff_location: dropoff_location || 'TBD',
+          pickup_date,
+          pickup_time,
+          service_type:     serviceMap[tripType] ?? 'standard',
+          passengers:       passengersNum,
+          payment_method:   'cash',
+          price_estimate:   getEstimatedPrice(),
+          notes:            `Vehicle: ${formData.carType}${formData.flightNo ? ` | Flight: ${formData.flightNo}` : ''}`,
         }),
       });
     } catch {
-      // Email failure is silent — booking continues normally
+      // silent — WhatsApp still opens
     }
   };
 
@@ -100,7 +121,7 @@ export function BookingWidget({ className }: { className?: string }) {
     msg += `👤 Name: ${formData.name}\n📞 Phone: ${formData.phone}`;
 
     const encoded = encodeURIComponent(msg);
-    sendBookingEmails();
+    saveBooking();
     window.open(`https://wa.me/966XXXXXXXXX?text=${encoded}`, '_blank');
   };
 

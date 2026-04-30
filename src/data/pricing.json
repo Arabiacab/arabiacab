@@ -1,0 +1,38 @@
+[
+  {
+    "id": "p1000000-0000-0000-0000-000000000001",
+    "service_type": "standard",
+    "base_price": 30,
+    "price_per_km": 1.5,
+    "minimum_price": 30,
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "p2000000-0000-0000-0000-000000000002",
+    "service_type": "airport",
+    "base_price": 80,
+    "price_per_km": 2.0,
+    "minimum_price": 80,
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "p3000000-0000-0000-0000-000000000003",
+    "service_type": "tour",
+    "base_price": 200,
+    "price_per_km": 0,
+    "minimum_price": 200,
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "p4000000-0000-0000-0000-000000000004",
+    "service_type": "rental",
+    "base_price": 400,
+    "price_per_km": 0,
+    "minimum_price": 400,
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00Z"
+  }
+]
