@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getBookings, createBooking, createNotification } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
-import { Resend } from 'resend';
-import { bookingConfirmationHtml, adminNewBookingHtml } from '@/emails/templates';
 import type { BookingFilters } from '@/types';
 
 // ─── Rate limiting (in-memory, per IP) ───────────────────────────────────────
@@ -99,28 +97,6 @@ export async function POST(request: NextRequest) {
     booking_id: booking.id,
     message: `New booking ${booking.booking_ref} from ${booking.customer_name} — ${booking.pickup_location} to ${booking.dropoff_location}`,
   });
-
-  // Emails (fire-and-forget)
-  try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const sends = [
-      resend.emails.send({
-        from: 'bookings@arabiacab.com',
-        to: 'arabiacab04@gmail.com',
-        subject: `🚗 New Booking — ${booking.customer_name}`,
-        html: adminNewBookingHtml(booking),
-      }),
-    ];
-    if (booking.customer_email) {
-      sends.push(resend.emails.send({
-        from: 'bookings@arabiacab.com',
-        to: booking.customer_email,
-        subject: `Booking Confirmed — Ref #${booking.booking_ref}`,
-        html: bookingConfirmationHtml(booking),
-      }));
-    }
-    await Promise.allSettled(sends);
-  } catch { /* silent */ }
 
   return NextResponse.json({ success: true, data: booking }, { status: 201 });
 }

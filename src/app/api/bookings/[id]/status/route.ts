@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getBookingById, updateBooking, createNotification } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
-import { Resend } from 'resend';
-import { bookingCancelledHtml, statusUpdateHtml } from '@/emails/templates';
 
 function requireAdmin(request: NextRequest): boolean {
   const token = request.cookies.get('admin_token')?.value;
@@ -36,28 +34,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     booking_id: booking.id,
     message: `Booking ${booking.booking_ref} status changed to ${status}`,
   });
-
-  // Send email based on new status
-  if (booking.customer_email) {
-    try {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      if (status === 'cancelled') {
-        await resend.emails.send({
-          from: 'bookings@arabiacab.com',
-          to: booking.customer_email,
-          subject: `Booking Cancelled — Ref #${booking.booking_ref}`,
-          html: bookingCancelledHtml(booking, reason),
-        });
-      } else if (['confirmed', 'in_progress', 'completed'].includes(status)) {
-        await resend.emails.send({
-          from: 'bookings@arabiacab.com',
-          to: booking.customer_email,
-          subject: `Your ride status updated — Arabia Cab`,
-          html: statusUpdateHtml(booking),
-        });
-      }
-    } catch { /* silent */ }
-  }
 
   return NextResponse.json({ success: true, data: booking });
 }

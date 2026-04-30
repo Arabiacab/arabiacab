@@ -121,7 +121,24 @@ export function BookingWidget({ className }: { className?: string }) {
     msg += `👤 Name: ${formData.name}\n📞 Phone: ${formData.phone}`;
 
     const encoded = encodeURIComponent(msg);
+
+    // Save booking to Supabase (fire-and-forget)
     saveBooking();
+
+    // Send confirmation emails via /api/send-email (fire-and-forget)
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:    formData.name,
+        email:   formData.email,
+        phone:   formData.phone,
+        date:    formData.date ? formData.date.split('T')[0] : '',
+        time:    formData.date ? (formData.date.split('T')[1]?.slice(0, 5) ?? '') : '',
+        service: getServiceSummary(),
+      }),
+    }).catch(() => {});
+
     window.open(`https://wa.me/966XXXXXXXXX?text=${encoded}`, '_blank');
   };
 
