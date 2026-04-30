@@ -5,15 +5,17 @@ import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError('');
     setLoading(true);
+    // Read directly from DOM — handles browser autofill that bypasses onChange
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value.trim();
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -67,8 +69,7 @@ export default function AdminLoginPage() {
             </label>
             <input
               type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              name="email"
               required
               autoComplete="email"
               placeholder="admin@arabiacab.com"
@@ -83,8 +84,7 @@ export default function AdminLoginPage() {
             </label>
             <input
               type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+              name="password"
               required
               autoComplete="current-password"
               placeholder="••••••••"

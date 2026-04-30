@@ -3,7 +3,9 @@ import { createToken, HARDCODED_ADMIN } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const body = await request.json();
+    const email = (body.email ?? '').trim();
+    const password = (body.password ?? '').trim();
 
     if (email !== HARDCODED_ADMIN.email || password !== HARDCODED_ADMIN.password) {
       return NextResponse.json({ success: false, error: 'Invalid email or password' }, { status: 401 });
