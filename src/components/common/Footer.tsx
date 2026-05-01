@@ -1,77 +1,155 @@
 import { Link } from '@/i18n/routing';
-import { FaInstagram, FaTwitter, FaSnapchatGhost, FaTiktok } from 'react-icons/fa';
+import { Phone, Mail, MapPin } from 'lucide-react';
+
+const footerLinks = {
+  user: [
+    { label: 'Login', href: '/login' },
+    { label: 'Testimonial', href: '/#testimonials' },
+    { label: 'Line Up Car', href: '/#fleet' },
+    { label: 'Feature', href: '/#features' },
+  ],
+  legal: [
+    { label: 'Terms & Conditions', href: '/terms-of-service' },
+    { label: 'Privacy Policy', href: '/privacy-policy' },
+    { label: 'System Status', href: '#' },
+    { label: 'Get Own Account', href: '/booking' },
+  ],
+  cities: [
+    { label: 'Riyadh', href: '/riyadh' },
+    { label: 'Jeddah', href: '/jeddah' },
+    { label: 'Mecca', href: '/mecca' },
+    { label: 'Medina', href: '/medina' },
+    { label: 'Dammam', href: '/dammam' },
+  ],
+};
 
 export function Footer() {
   return (
-    <footer className="bg-[#050505] pt-20 pb-10 border-t border-[#333333]">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#C9A84C] flex items-center justify-center">
-                <span className="text-[#0A0A0A] font-bold text-lg font-display">A</span>
+    <footer
+      className="bg-[#0A0A0A] pt-16 pb-8"
+      style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+    >
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+
+        {/* Top Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-14">
+
+          {/* Brand — 2 cols wide on large */}
+          <div className="lg:col-span-2">
+            <Link href="/" className="flex items-center gap-2.5 mb-4">
+              <div className="w-8 h-8 bg-[#CCFF00] rounded-lg flex items-center justify-center">
+                <span
+                  className="text-[#0A0A0A] font-bold text-xs"
+                  style={{ fontFamily: 'var(--font-syne), sans-serif' }}
+                >
+                  AC
+                </span>
               </div>
-              <span className="text-white font-display text-xl font-bold tracking-wider">
-                Arabia<span className="text-[#C9A84C]">Cab</span>
+              <span
+                className="text-white font-bold text-[1.05rem]"
+                style={{ fontFamily: 'var(--font-syne), sans-serif' }}
+              >
+                Arabia<span className="text-[#CCFF00]">Cab</span>
               </span>
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Reliable taxi service in Saudi Arabia — Riyadh, Jeddah, Makkah, Madinah &amp; Dammam. ArabiaCab is your trusted ride in Arabia, available 24/7 with fixed prices and professional drivers.
+            <p className="text-[#666] text-sm leading-relaxed max-w-[280px]">
+              Luxury taxi service in Saudi Arabia. Offering premium taxis with trained drivers to ensure your trip goes smoothly. Book now and enjoy a special trip.
             </p>
-            <div className="flex gap-4">
-              {[FaInstagram, FaTwitter, FaSnapchatGhost, FaTiktok].map((Icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 rounded-full bg-[#111111] border border-[#333333] flex items-center justify-center text-gray-400 hover:text-[#C9A84C] hover:border-[#C9A84C] transition-colors">
-                  <Icon className="w-4 h-4" />
-                </a>
+          </div>
+
+          {/* User Links */}
+          <div>
+            <h5
+              className="text-white font-semibold text-sm mb-5"
+              style={{ fontFamily: 'var(--font-syne), sans-serif' }}
+            >
+              User Login
+            </h5>
+            <ul className="flex flex-col gap-3">
+              {footerLinks.user.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href as any}
+                    className="text-[#666] hover:text-white text-sm transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white font-bold font-display text-lg mb-2">Quick Links</h4>
-            {['Home', 'Fleet', 'Services', 'Booking', 'About', 'Contact'].map((item) => (
-              <Link key={item} href={`/${item.toLowerCase() === 'home' ? '' : item.toLowerCase()}`} className="text-gray-400 hover:text-[#C9A84C] text-sm transition-colors">
-                {item}
-              </Link>
-            ))}
+          {/* Legal Links */}
+          <div>
+            <h5
+              className="text-white font-semibold text-sm mb-5"
+              style={{ fontFamily: 'var(--font-syne), sans-serif' }}
+            >
+              Legal
+            </h5>
+            <ul className="flex flex-col gap-3">
+              {footerLinks.legal.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href as any}
+                    className="text-[#666] hover:text-white text-sm transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white font-bold font-display text-lg mb-2">Cities We Serve</h4>
-            {['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam', 'Al-Ula'].map((city) => (
-              <Link key={city} href={`/${city.toLowerCase()}`} className="text-gray-400 hover:text-[#C9A84C] text-sm transition-colors">
-                {city}
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white font-bold font-display text-lg mb-2">Contact Us</h4>
-            <div className="text-gray-400 text-sm flex flex-col gap-2">
-              <p>Phone: +966 5X XXX XXXX</p>
-              <p>WhatsApp: +966 5X XXX XXXX</p>
-              <p>Email: bookings@arabiacab.com</p>
-              <p className="mt-2 text-[#C9A84C] font-bold">Licensed in Saudi Arabia 🇸🇦</p>
-              <p className="text-xs text-gray-500 mt-2">
-                CR Number: 1010XXXXXX <br />
-                VAT Number: 3100XXXXXX00003 <br />
-                <span className="text-gray-400 mt-1 block">* All prices include 15% VAT</span>
-              </p>
-            </div>
+          {/* Cities */}
+          <div>
+            <h5
+              className="text-white font-semibold text-sm mb-5"
+              style={{ fontFamily: 'var(--font-syne), sans-serif' }}
+            >
+              Cities
+            </h5>
+            <ul className="flex flex-col gap-3">
+              {footerLinks.cities.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href as any}
+                    className="text-[#666] hover:text-white text-sm transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-[#333333] gap-4">
-          <p className="text-gray-500 text-sm">
-            © 2025 ArabiaCab. All Rights Reserved.
+        {/* Bottom Bar */}
+        <div
+          className="flex flex-col md:flex-row items-center justify-between gap-4 pt-7"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+        >
+          <p className="text-[#555] text-xs">
+            © 2025 ArabiaCab. All Rights Reserved. Licensed in Saudi Arabia 🇸🇦
           </p>
-          <div className="flex gap-4 text-sm">
-            <Link href="/privacy-policy" className="text-gray-500 hover:text-[#C9A84C] transition-colors">Privacy Policy</Link>
-            <Link href="/terms-of-service" className="text-gray-500 hover:text-[#C9A84C] transition-colors">Terms of Service</Link>
+
+          <div className="flex flex-wrap items-center gap-5 text-[#555] text-xs">
+            <span className="flex items-center gap-1.5">
+              <Phone className="w-3 h-3 text-[#CCFF00]" />
+              +966 5X XXX XXXX
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Mail className="w-3 h-3 text-[#CCFF00]" />
+              bookings@arabiacab.com
+            </span>
+            <span className="flex items-center gap-1.5">
+              <MapPin className="w-3 h-3 text-[#CCFF00]" />
+              Saudi Arabia
+            </span>
           </div>
         </div>
+
       </div>
     </footer>
   );

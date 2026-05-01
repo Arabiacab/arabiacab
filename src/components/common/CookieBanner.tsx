@@ -52,7 +52,7 @@ export function CookieBanner() {
                 </Button>
                 <Button 
                   onClick={acceptAll}
-                  className="bg-[#C9A84C] hover:bg-[#F0D080] text-black font-bold"
+                  className="bg-[#CCFF00] hover:bg-[#B8E600] text-[#0A0A0A] font-bold"
                 >
                   Accept All
                 </Button>

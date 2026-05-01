@@ -63,7 +63,7 @@ export function CityPageTemplate({ cityData, locale }: { cityData: any; locale: 
           "name": cityData.nameEn,
           "containedInPlace": { "@type": "Country", "name": "Saudi Arabia" }
         },
-        "telephone": "+966XXXXXXXXX",
+        "telephone": "+966503667424",
         "email": "bookings@arabiacab.com",
         "openingHours": "Mo-Su 00:00-24:00",
         "priceRange": `SAR ${cityData.stats.price} - SAR 1100`,

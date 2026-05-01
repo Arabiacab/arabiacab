@@ -1,157 +1,288 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { buttonVariants } from '@/components/ui/button';
-import { FaWhatsapp } from 'react-icons/fa';
-import { Link } from '@/i18n/routing';
+import { Globe, ArrowUpRight, ArrowRight, Loader2 } from 'lucide-react';
+import { Link, usePathname, useRouter } from '@/i18n/routing';
+import { useLocale } from 'next-intl';
 
-// Pre-computed stable values — Math.random() at render time causes SSR/client hydration mismatch
-const PARTICLES = [
-  { w: 3.99, h: 4.87, top: 53.7,  left: 33.9,  opacity: 0.31 },
-  { w: 2.58, h: 2.20, top: 75.7,  left: 67.9,  opacity: 0.26 },
-  { w: 3.34, h: 2.02, top: 88.3,  left: 11.7,  opacity: 0.38 },
-  { w: 2.10, h: 2.73, top: 34.8,  left: 37.6,  opacity: 0.34 },
-  { w: 2.66, h: 3.20, top: 24.3,  left: 58.0,  opacity: 0.56 },
-  { w: 2.77, h: 4.03, top: 75.1,  left: 72.1,  opacity: 0.24 },
-  { w: 2.35, h: 3.55, top: 85.2,  left: 22.5,  opacity: 0.26 },
-  { w: 1.56, h: 4.60, top: 11.2,  left: 65.7,  opacity: 0.31 },
-  { w: 4.81, h: 3.67, top: 52.9,  left: 42.9,  opacity: 0.38 },
-  { w: 1.83, h: 3.73, top: 68.6,  left: 45.3,  opacity: 0.40 },
-  { w: 1.30, h: 4.61, top: 55.1,  left: 49.3,  opacity: 0.57 },
-  { w: 3.55, h: 4.44, top: 30.0,  left: 62.7,  opacity: 0.26 },
-  { w: 4.52, h: 3.48, top: 96.8,  left: 59.5,  opacity: 0.33 },
-  { w: 2.15, h: 2.99, top: 21.1,  left: 62.6,  opacity: 0.45 },
-  { w: 3.86, h: 3.94, top: 91.1,  left: 55.6,  opacity: 0.21 },
-  { w: 2.26, h: 4.80, top: 35.2,  left: 42.1,  opacity: 0.45 },
-  { w: 1.84, h: 2.53, top: 48.7,  left: 85.9,  opacity: 0.37 },
-  { w: 2.68, h: 3.65, top: 96.9,  left: 40.3,  opacity: 0.27 },
-  { w: 1.80, h: 4.29, top: 47.2,  left: 40.3,  opacity: 0.55 },
-  { w: 2.31, h: 1.36, top: 6.3,   left: 93.4,  opacity: 0.55 },
+
+const NAV_LINKS = [
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  { label: 'Services', href: '/services' },
+  { label: 'Cities', href: '/cities' },
+  { label: 'Pricing', href: '/pricing' },
 ];
 
+const FIELD = 'bg-transparent text-white text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark]';
+const LABEL = { fontSize: '11px', color: 'rgba(255,255,255,0.48)', fontWeight: 500, marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase' as const };
+const DIVIDER = { borderRight: '1px solid rgba(255,255,255,0.1)' };
+
 export function Hero() {
-  const t = useTranslations('HomePage');
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Row 1 — trip details
+  const [pickup, setPickup]           = useState('');
+  const [destination, setDestination] = useState('');
+  const [date, setDate]               = useState('');
+  const [time, setTime]               = useState('');
+
+  // Row 2 — contact
+  const [name, setName]   = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+
+  const toggleLanguage = () =>
+    router.replace(pathname, { locale: locale === 'en' ? 'ar' : 'en' });
+
+  const handleConfirm = async () => {
+    if (!name.trim()) { setError('Please enter your name.'); return; }
+    if (!phone.trim()) { setError('Please enter your WhatsApp number.'); return; }
+    setError('');
+    setLoading(true);
+
+    const fullPhone = `+966${phone.replace(/^\+966/, '')}`;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Save booking (fire-and-forget)
+    fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name:    name,
+        customer_phone:   fullPhone,
+        customer_email:   email || undefined,
+        pickup_location:  pickup  || 'TBD',
+        dropoff_location: destination || 'TBD',
+        pickup_date:      date   || today,
+        pickup_time:      time   || '00:00',
+        service_type:     'standard',
+        passengers:       1,
+        payment_method:   'cash',
+        price_estimate:   0,
+        notes:            'Booking via hero form',
+      }),
+    }).catch(() => {});
+
+    // Send confirmation email (fire-and-forget)
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, email, phone: fullPhone,
+        date: date || today,
+        time: time || '',
+        service: `${pickup || 'TBD'} → ${destination || 'TBD'}`,
+      }),
+    }).catch(() => {});
+
+    // Build WhatsApp message
+    const msg = [
+      `🚕 *New Booking — ArabiaCab*`,
+      `───────────────────`,
+      `🚗 From: ${pickup  || 'TBD'}`,
+      `📌 To: ${destination || 'TBD'}`,
+      `📅 Date: ${date || '—'}`,
+      `🕒 Time: ${time || '—'}`,
+      `───────────────────`,
+      `👤 Name: ${name}`,
+      `📞 Phone: ${fullPhone}`,
+      email ? `📧 Email: ${email}` : '',
+    ].filter(Boolean).join('\n');
+
+    setLoading(false);
+    window.open(`https://wa.me/966503667424?text=${encodeURIComponent(msg)}`, '_blank');
+  };
 
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#0A0A0A]">
-      {/* Fallback dark gradient with gold geometric pattern */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1a1a1a] via-[#0A0A0A] to-[#0A0A0A]"></div>
-      
-      {/* Grain Texture Overlay */}
-      <div className="absolute inset-0 z-0 opacity-5 pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
-
-      {/* Floating particles */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {PARTICLES.map((p, i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full bg-[#C9A84C]"
-            style={{
-              width: `${p.w}px`,
-              height: `${p.h}px`,
-              top: `${p.top}%`,
-              left: `${p.left}%`,
-              opacity: p.opacity,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.1, 0.6, 0.1],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A84C]/40 bg-[#C9A84C]/10 text-[#C9A84C] text-sm font-semibold tracking-widest uppercase"
-        >
-          ArabiaCab — Your Trusted Ride in Arabia
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-4"
-        >
-          {t('title')}
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-2xl md:text-3xl font-display font-semibold text-[#C9A84C] mb-4"
-        >
-          Taxi Service in Saudi Arabia
-        </motion.p>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="max-w-[700px] text-lg md:text-xl text-gray-300 mb-10"
-        >
-          {t('subtitle')}
-        </motion.p>
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex flex-col sm:flex-row gap-4"
-        >
-          <Link 
-            href="/booking"
-            className={buttonVariants({ size: "lg", className: "bg-[#C9A84C] hover:bg-[#F0D080] text-black font-semibold px-8 py-6 text-lg rounded-none transition-all duration-300 shadow-[0_0_15px_rgba(201,168,76,0.3)] hover:shadow-[0_0_25px_rgba(201,168,76,0.6)]" })}
-          >
-            {t('bookNow')}
-          </Link>
-          <a 
-            href="https://wa.me/966XXXXXXXXX" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className={buttonVariants({ variant: "outline", size: "lg", className: "border-[#25D366] text-[#25D366] hover:bg-[#25D366]/10 px-8 py-6 text-lg rounded-none transition-all duration-300 bg-transparent" })}
-          >
-            <FaWhatsapp className="mr-2 h-5 w-5" />
-            {t('whatsappUs')}
-          </a>
-        </motion.div>
-
-        {/* Trust Badges */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="mt-16 flex flex-wrap justify-center gap-6 text-sm text-gray-400"
-        >
-          {['24/7 Available', '5000+ Trips', 'Reliable Taxi Arabia', 'All Saudi Cities'].map((badge, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <span className="text-[#C9A84C]">✓</span> {badge}
-            </div>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <motion.div 
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[#C9A84C]"
+    <>
+      {/* ── Fixed "Book a Ride" button ── */}
+      <Link
+        href="/booking"
+        className="fixed z-[1002] flex items-center gap-2 font-bold text-[#0A0A0A] transition-all duration-200 hover:scale-[1.02]"
+        style={{
+          top: '16px', right: '16px',
+          background: '#CCFF00',
+          borderRadius: '16px',
+          padding: '14px 28px',
+          fontSize: '15px',
+          fontWeight: 700,
+          fontFamily: 'var(--font-syne), sans-serif',
+          boxShadow: '0 4px 20px rgba(204,255,0,0.32)',
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#B8E600'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#CCFF00'; }}
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 5V19M12 19L5 12M12 19L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </motion.div>
-    </section>
+        {locale === 'ar' ? 'احجز رحلة' : 'Book a Ride'}
+        <ArrowUpRight className="w-4 h-4" />
+      </Link>
+
+      {/* ── Hero Card ── */}
+      <div
+        className="relative overflow-hidden"
+        style={{ background: '#090909', margin: '12px 12px 0', borderRadius: '20px', minHeight: '88vh' }}
+      >
+        {/* Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Car — drives in from right, then floats */}
+          <motion.div
+            className="absolute right-0 top-0 bottom-0"
+            style={{ width: '85%' }}
+            initial={{ x: 160, opacity: 0, scale: 0.94 }}
+            animate={{ x: 0, opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <motion.div
+              className="absolute inset-0"
+              animate={{ x: [0, -14, 0] }}
+              transition={{ duration: 5, ease: 'easeInOut', repeat: Infinity }}
+            >
+              <Image
+                src="/cars/gmc_yukon.png" alt="" fill priority
+                className="object-contain"
+                style={{ objectPosition: 'center 75%', transform: 'scale(1.18)', transformOrigin: 'center bottom' }}
+              />
+            </motion.div>
+          </motion.div>
+
+          {/* Bottom fade for booking bar readability */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 45%, rgba(10,10,12,0.75) 75%, rgba(10,10,12,0.97) 100%)' }} />
+          {/* Subtle left fade so text stays readable over the car */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(10,10,12,0.72) 0%, rgba(10,10,12,0.28) 35%, transparent 60%)' }} />
+        </div>
+
+        {/* ── Header row: logo left, nav pill center ── */}
+        <div className="relative z-20 flex items-center px-6 pt-5" style={{ minHeight: '60px' }}>
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#CCFF00' }}>
+              <span className="text-[#0A0A0A] font-bold text-[11px]" style={{ fontFamily: 'var(--font-syne), sans-serif' }}>AC</span>
+            </div>
+            <span className="text-white font-bold text-[15px] hidden sm:block" style={{ fontFamily: 'var(--font-syne), sans-serif' }}>
+              Arabia<span style={{ color: '#CCFF00' }}>Cab</span>
+            </span>
+          </Link>
+
+          <nav
+            className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-7"
+            style={{ background: 'rgba(255,255,255,0.11)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: '100px', padding: '9px 24px' }}
+          >
+            {NAV_LINKS.map((link) => (
+              <Link key={link.label} href={link.href as any}
+                className="text-sm font-medium transition-colors duration-200"
+                style={{ color: 'rgba(255,255,255,0.82)' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#FFFFFF'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.82)'; }}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <button onClick={toggleLanguage}
+              className="flex items-center gap-1.5 text-sm font-medium transition-colors"
+              style={{ color: 'rgba(255,255,255,0.6)' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#FFFFFF'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)'; }}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>{locale === 'en' ? 'عربي' : 'EN'}</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* ── Hero Content ── */}
+        <div className="absolute z-10 left-10 right-6 md:right-auto" style={{ bottom: '220px' }}>
+          <motion.h1
+            initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+            className="text-white font-bold mb-3 leading-[1.08]"
+            style={{ fontFamily: 'var(--font-syne), sans-serif', fontSize: 'clamp(34px, 5vw, 60px)', letterSpacing: '-1.5px' }}
+          >
+            Exclusive Rides,<br />Premier Service
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.12 }}
+            style={{ color: 'rgba(255,255,255,0.68)', fontSize: '15px', lineHeight: 1.6, maxWidth: '420px', marginTop: '10px' }}
+          >
+            Professional city-to-city rides across Saudi Arabia.
+          </motion.p>
+        </div>
+
+        {/* ── Two-Row Booking Form ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+          className="absolute bottom-0 left-0 right-0 z-20"
+          style={{ background: 'rgba(22,22,22,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderTop: '1px solid rgba(255,255,255,0.09)', borderRadius: '0 0 20px 20px' }}
+        >
+          {/* Row 1 — Trip details */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0"
+            style={{ padding: '16px 28px 0', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            <div className="flex-1 pb-4 md:pb-3 md:pr-5" style={DIVIDER}>
+              <p style={LABEL}>Pick Up</p>
+              <input className={FIELD} placeholder="Pickup city or address" value={pickup} onChange={e => setPickup(e.target.value)} />
+            </div>
+            <div className="flex-1 pb-4 md:pb-3 md:px-5" style={DIVIDER}>
+              <p style={LABEL}>Destination</p>
+              <input className={FIELD} placeholder="Drop-off city or address" value={destination} onChange={e => setDestination(e.target.value)} />
+            </div>
+            <div className="flex-1 pb-4 md:pb-3 md:px-5" style={DIVIDER}>
+              <p style={LABEL}>Date</p>
+              <input type="date" className={FIELD} value={date} onChange={e => setDate(e.target.value)} />
+            </div>
+            <div className="flex-1 pb-4 md:pb-3 md:pl-5">
+              <p style={LABEL}>Time</p>
+              <input type="time" className={FIELD} value={time} onChange={e => setTime(e.target.value)} />
+            </div>
+          </div>
+
+          {/* Row 2 — Contact details + submit */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0"
+            style={{ padding: '0 28px 16px' }}
+          >
+            <div className="flex-1 pt-3 md:pr-5" style={DIVIDER}>
+              <p style={LABEL}>Your Name</p>
+              <input className={FIELD} placeholder="Full name" value={name} onChange={e => setName(e.target.value)} />
+            </div>
+            <div className="flex-1 pt-3 md:px-5" style={DIVIDER}>
+              <p style={LABEL}>WhatsApp</p>
+              <div className="flex items-center gap-1">
+                <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13px', fontWeight: 500 }}>+966</span>
+                <input className={FIELD} placeholder="5X XXX XXXX" value={phone} onChange={e => setPhone(e.target.value)} />
+              </div>
+            </div>
+            <div className="flex-1 pt-3 md:px-5" style={DIVIDER}>
+              <p style={LABEL}>Email (optional)</p>
+              <input type="email" className={FIELD} placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+            </div>
+            <div className="pt-3 md:pl-5 flex items-end">
+              <button
+                onClick={handleConfirm}
+                disabled={loading}
+                className="flex items-center gap-2 font-bold text-[#0A0A0A] rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-60 whitespace-nowrap"
+                style={{ background: '#CCFF00', padding: '12px 22px', fontSize: '14px', boxShadow: '0 4px 20px rgba(204,255,0,0.25)' }}
+                onMouseEnter={(e) => { if (!loading) (e.currentTarget as HTMLElement).style.background = '#B8E600'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#CCFF00'; }}
+              >
+                {loading
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
+                  : 'Confirm Booking'
+                }
+              </button>
+            </div>
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <p className="px-7 pb-3 text-xs" style={{ color: '#ff6b6b' }}>{error}</p>
+          )}
+        </motion.div>
+
+      </div>
+    </>
   );
 }

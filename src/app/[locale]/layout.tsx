@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Playfair_Display, DM_Sans, Cairo, Noto_Sans_Arabic, Bebas_Neue } from "next/font/google";
+import { Syne, Inter, Cairo, Noto_Sans_Arabic, Bebas_Neue } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { Footer } from '@/components/common/Footer';
-import { FloatingWhatsApp } from '@/components/common/FloatingWhatsApp';
 import { CookieBanner } from '@/components/common/CookieBanner';
 import "../globals.css";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
 });
 
 const cairo = Cairo({
@@ -73,11 +74,11 @@ export default async function RootLayout({
       lang={locale}
       dir={dir}
       className={`
-        ${playfair.variable} 
-        ${dmSans.variable} 
-        ${cairo.variable} 
-        ${notoArabic.variable} 
-        ${bebasNeue.variable} 
+        ${syne.variable}
+        ${inter.variable}
+        ${cairo.variable}
+        ${notoArabic.variable}
+        ${bebasNeue.variable}
         h-full antialiased
       `}
     >
@@ -87,7 +88,6 @@ export default async function RootLayout({
             {children}
             <Footer />
           </div>
-          <FloatingWhatsApp />
           <CookieBanner />
         </NextIntlClientProvider>
       </body>

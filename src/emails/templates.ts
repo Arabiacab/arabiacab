@@ -80,7 +80,7 @@ export function bookingConfirmationHtml(booking: Booking): string {
     </p>
 
     <div style="text-align:center;">
-      <a href="https://wa.me/966XXXXXXXXX" style="display:inline-block;background:#25D366;color:#ffffff;font-size:15px;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;">
+      <a href="https://wa.me/966503667424" style="display:inline-block;background:#25D366;color:#ffffff;font-size:15px;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;">
         📱 Contact via WhatsApp
       </a>
     </div>
@@ -190,7 +190,7 @@ export function statusUpdateHtml(booking: Booking): string {
     </p>
 
     <div style="text-align:center;">
-      <a href="https://wa.me/966XXXXXXXXX" style="display:inline-block;background:#25D366;color:#ffffff;font-size:15px;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;">
+      <a href="https://wa.me/966503667424" style="display:inline-block;background:#25D366;color:#ffffff;font-size:15px;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;">
         Contact Driver / Support
       </a>
     </div>

@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, date, time, service } = body;
+    const { name, email, phone, date, time, service, vehicle, bookingRef } = body;
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -28,6 +28,8 @@ export async function POST(request: Request) {
         <tr><td style="padding:28px 32px;">
           <p style="margin:0 0 20px;color:#333;font-size:16px;">A new booking has been submitted:</p>
           <table width="100%" style="border-collapse:collapse;">
+            ${bookingRef ? `<tr><td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#666;font-size:14px;width:120px;">Booking Ref</td>
+                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#c8f000;font-size:14px;font-weight:700;">${bookingRef}</td></tr>` : ''}
             <tr><td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#666;font-size:14px;width:120px;">Name</td>
                 <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#222;font-size:14px;font-weight:600;">${name || '—'}</td></tr>
             <tr><td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#666;font-size:14px;">Phone</td>
@@ -38,6 +40,8 @@ export async function POST(request: Request) {
                 <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#222;font-size:14px;font-weight:600;">${date || '—'}</td></tr>
             <tr><td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#666;font-size:14px;">Time</td>
                 <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#222;font-size:14px;font-weight:600;">${time || '—'}</td></tr>
+            <tr><td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#666;font-size:14px;">Vehicle</td>
+                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;color:#222;font-size:14px;font-weight:600;">${vehicle || '—'}</td></tr>
             <tr><td style="padding:10px 0;color:#666;font-size:14px;">Service</td>
                 <td style="padding:10px 0;color:#222;font-size:14px;font-weight:600;">${service || '—'}</td></tr>
           </table>
@@ -77,10 +81,14 @@ export async function POST(request: Request) {
             We have received your booking request and will contact you shortly on WhatsApp or phone to confirm.
           </p>
           <table width="100%" style="border-collapse:collapse;background:#f9f9f9;border-radius:6px;">
+            ${bookingRef ? `<tr><td style="padding:12px 16px;border-bottom:1px solid #eee;color:#666;font-size:14px;width:140px;">Booking Reference</td>
+                <td style="padding:12px 16px;border-bottom:1px solid #eee;color:#1a1a2e;font-size:15px;font-weight:700;letter-spacing:2px;">${bookingRef}</td></tr>` : ''}
             <tr><td style="padding:12px 16px;border-bottom:1px solid #eee;color:#666;font-size:14px;width:120px;">Date</td>
                 <td style="padding:12px 16px;border-bottom:1px solid #eee;color:#222;font-size:14px;font-weight:600;">${date || '—'}</td></tr>
             <tr><td style="padding:12px 16px;border-bottom:1px solid #eee;color:#666;font-size:14px;">Time</td>
                 <td style="padding:12px 16px;border-bottom:1px solid #eee;color:#222;font-size:14px;font-weight:600;">${time || '—'}</td></tr>
+            <tr><td style="padding:12px 16px;border-bottom:1px solid #eee;color:#666;font-size:14px;">Vehicle</td>
+                <td style="padding:12px 16px;border-bottom:1px solid #eee;color:#222;font-size:14px;font-weight:600;">${vehicle || '—'}</td></tr>
             <tr><td style="padding:12px 16px;color:#666;font-size:14px;">Service</td>
                 <td style="padding:12px 16px;color:#222;font-size:14px;font-weight:600;">${service || '—'}</td></tr>
           </table>

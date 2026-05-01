@@ -1,284 +1,243 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Calendar, Users, Car, Plane, Globe, Star, ArrowRight, Phone } from 'lucide-react';
-import { FaWhatsapp } from 'react-icons/fa';
+import { MapPin, Globe, Loader2, CheckCircle2, MessageCircle } from 'lucide-react';
+
+const INPUT = 'w-full bg-[#1A1A1A] border border-[rgba(255,255,255,0.1)] focus:border-[#CCFF00] text-white text-sm rounded-xl py-3 px-4 outline-none transition-colors placeholder:text-[#444] [color-scheme:dark]';
+const SELECT = 'w-full bg-[#1A1A1A] border border-[rgba(255,255,255,0.1)] focus:border-[#CCFF00] text-white text-sm rounded-xl py-3 px-4 outline-none appearance-none transition-colors';
+const LABEL = 'text-xs text-[#666] uppercase tracking-wider font-medium';
+
+const CAR_PRICES: Record<string, number> = {
+  'Economy Sedan (Camry)':       45,
+  'Business SUV (Yukon)':        85,
+  'Luxury Sedan (Lexus/Mercedes)': 120,
+  'VIP SUV (Escalade)':          200,
+  'Family Van (Hiace)':          150,
+};
 
 export function BookingWidget({ className }: { className?: string }) {
-  const t = useTranslations('HomePage');
-  const [tripType, setTripType] = useState('city');
-  
-  // Form State
-  const [formData, setFormData] = useState({
-    pickup: '',
-    drop: '',
-    date: '',
-    passengers: '1',
-    carType: 'Economy Sedan',
-    airportDir: 'from',
-    airport: 'King Khalid — Riyadh (RUH)',
-    flightNo: '',
-    fromCity: 'Riyadh',
-    toCity: 'Jeddah',
-    serviceType: 'Airport → Makkah Hotel',
-    name: '',
-    phone: '',
-    email: ''
+  const [tripType, setTripType] = useState<'city' | 'intercity'>('city');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [booked, setBooked]     = useState(false);
+  const [waMsg, setWaMsg]       = useState('');
+
+  const [form, setForm] = useState({
+    pickup:    '',
+    drop:      '',
+    fromCity:  'Riyadh',
+    toCity:    'Jeddah',
+    date:      '',
+    carType:   'Economy Sedan (Camry)',
+    passengers: '1 Passenger',
+    name:      '',
+    phone:     '',
+    email:     '',
   });
 
-  const handleChange = (e: any) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm(prev => ({ ...prev, [field]: e.target.value }));
+
+  // Pre-fill from AvailableRoutes
+  useEffect(() => {
+    const handler = (e: CustomEvent<{ type: 'intercity'; from: string; to: string }>) => {
+      setTripType(e.detail.type);
+      setForm(prev => ({ ...prev, fromCity: e.detail.from, toCity: e.detail.to }));
+    };
+    window.addEventListener('arabiacab:selectRoute', handler as EventListener);
+    return () => window.removeEventListener('arabiacab:selectRoute', handler as EventListener);
+  }, []);
+
+  // Pre-fill car type from FleetShowcase
+  useEffect(() => {
+    const handler = (e: CustomEvent<{ widgetOption: string; price: number }>) => {
+      setForm(prev => ({ ...prev, carType: e.detail.widgetOption }));
+    };
+    window.addEventListener('arabiacab:selectCar', handler as EventListener);
+    return () => window.removeEventListener('arabiacab:selectCar', handler as EventListener);
+  }, []);
 
   const getEstimatedPrice = () => {
-    // Simple mock logic for instant price estimate
     if (tripType === 'intercity') {
-      if ((formData.fromCity === 'Riyadh' && formData.toCity === 'Jeddah') || (formData.fromCity === 'Jeddah' && formData.toCity === 'Riyadh')) return 1100;
-      if ((formData.fromCity === 'Makkah' && formData.toCity === 'Madinah') || (formData.fromCity === 'Madinah' && formData.toCity === 'Makkah')) return 450;
-      if ((formData.fromCity === 'Jeddah' && formData.toCity === 'Makkah') || (formData.fromCity === 'Makkah' && formData.toCity === 'Jeddah')) return 180;
-      return 500;
-    }
-    if (tripType === 'airport') return 250;
-    if (tripType === 'hajj') return 600;
-    return 150;
-  };
-
-  const getServiceSummary = () => {
-    if (tripType === 'city') return `${formData.pickup} → ${formData.drop}`;
-    if (tripType === 'airport') return `${formData.airportDir === 'from' ? 'From' : 'To'} ${formData.airport}${formData.flightNo ? ` (Flight: ${formData.flightNo})` : ''}`;
-    if (tripType === 'intercity') return `${formData.fromCity} → ${formData.toCity}`;
-    if (tripType === 'hajj') return formData.serviceType;
-    return '';
-  };
-
-  const saveBooking = async () => {
-    try {
-      const [pickup_location, dropoff_location] = (() => {
-        if (tripType === 'city')      return [formData.pickup || 'TBD', formData.drop || 'TBD'];
-        if (tripType === 'airport')   return formData.airportDir === 'from'
-          ? [formData.airport, formData.pickup || 'City']
-          : [formData.pickup || 'City', formData.airport];
-        if (tripType === 'intercity') return [formData.fromCity, formData.toCity];
-        return [formData.serviceType, formData.pickup || 'Hotel'];
-      })();
-
-      const serviceMap: Record<string, string> = {
-        city: 'standard', airport: 'airport', intercity: 'standard', hajj: 'tour',
+      const pair = [form.fromCity, form.toCity].sort().join('-');
+      const routePrices: Record<string, number> = {
+        'Jeddah-Riyadh':  1100,
+        'Makkah-Riyadh':  1100,
+        'Madinah-Riyadh': 1100,
+        'Jeddah-Makkah':   180,
+        'Jeddah-Madinah':  450,
+        'Madinah-Makkah':  450,
+        'Dammam-Riyadh':   500,
+        'Abha-Riyadh':    1200,
+        'Dammam-Khobar':   100,
+        'Jeddah-Taif':     200,
+        'Riyadh-Tabuk':   1400,
+        'Qassim-Riyadh':   350,
+        'Abha-Jeddah':     900,
+        'Makkah-Taif':     120,
       };
-
-      const passengersNum = parseInt(formData.passengers) || 1;
-
-      const [pickup_date, pickup_time] = formData.date
-        ? [formData.date.split('T')[0], formData.date.split('T')[1]?.slice(0, 5) ?? '00:00']
-        : [new Date().toISOString().split('T')[0], '00:00'];
-
-      const phone = formData.phone
-        ? `+966${formData.phone.replace(/^\+966/, '')}`
-        : '+966000000000';
-
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customer_name:    formData.name || 'Guest',
-          customer_phone:   phone,
-          customer_email:   formData.email || undefined,
-          pickup_location,
-          dropoff_location,
-          pickup_date,
-          pickup_time,
-          service_type:     serviceMap[tripType] ?? 'standard',
-          passengers:       passengersNum,
-          payment_method:   'cash',
-          price_estimate:   getEstimatedPrice(),
-          notes:            `Vehicle: ${formData.carType}${formData.flightNo ? ` | Flight: ${formData.flightNo}` : ''}`,
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error('[saveBooking] failed:', res.status, err);
-      }
-    } catch (err) {
-      console.error('[saveBooking] error:', err);
+      return routePrices[pair] ?? 250;
     }
+    return CAR_PRICES[form.carType] ?? 45;
   };
 
-  const generateWhatsAppMessage = () => {
-    let msg = `🚕 *New Taxi Booking*\n─────────────────\n`;
-    msg += `📍 Type: ${tripType.toUpperCase()}\n`;
-    
-    if (tripType === 'city') {
-      msg += `🚗 From: ${formData.pickup}\n📌 To: ${formData.drop}\n`;
-    } else if (tripType === 'airport') {
-      msg += `✈️ Airport: ${formData.airportDir} ${formData.airport}\n`;
-      msg += `🏢 Location: ${formData.pickup || formData.drop}\n`;
-      msg += `🛬 Flight: ${formData.flightNo}\n`;
-    } else if (tripType === 'intercity') {
-      msg += `🚗 From City: ${formData.fromCity}\n📌 To City: ${formData.toCity}\n`;
-    } else if (tripType === 'hajj') {
-      msg += `🕌 Service: ${formData.serviceType}\n`;
-      msg += `🏢 Details: ${formData.pickup}\n`;
-    }
+  const getServiceSummary = () =>
+    tripType === 'city'
+      ? `${form.pickup || 'TBD'} → ${form.drop || 'TBD'}`
+      : `${form.fromCity} → ${form.toCity}`;
 
-    msg += `📅 Date: ${formData.date}\n`;
-    msg += `👥 Passengers: ${formData.passengers}\n`;
-    msg += `🚙 Vehicle: ${formData.carType}\n`;
-    msg += `💰 Estimated: SAR ${getEstimatedPrice()}\n─────────────────\n`;
-    msg += `👤 Name: ${formData.name}\n📞 Phone: ${formData.phone}`;
+  const handleConfirm = async () => {
+    if (!form.name.trim()) { setError('Please enter your name.'); return; }
+    if (!form.phone.trim()) { setError('Please enter your WhatsApp number.'); return; }
+    setError('');
+    setLoading(true);
 
-    const encoded = encodeURIComponent(msg);
+    const fullPhone = `+966${form.phone.replace(/^\+966/, '')}`;
+    const today = new Date().toISOString().split('T')[0];
+    const [pickup_date, pickup_time] = form.date
+      ? [form.date.split('T')[0], form.date.split('T')[1]?.slice(0, 5) ?? '00:00']
+      : [today, '00:00'];
 
-    // Save booking to Supabase (fire-and-forget)
-    saveBooking();
+    const [pickup_location, dropoff_location] =
+      tripType === 'city'
+        ? [form.pickup || 'TBD', form.drop || 'TBD']
+        : [form.fromCity, form.toCity];
 
-    // Send confirmation emails via /api/send-email (fire-and-forget)
+    // Save to admin panel
+    await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name:    form.name,
+        customer_phone:   fullPhone,
+        customer_email:   form.email || undefined,
+        pickup_location,
+        dropoff_location,
+        pickup_date,
+        pickup_time,
+        service_type:     'standard',
+        passengers:       parseInt(form.passengers) || 1,
+        payment_method:   'cash',
+        price_estimate:   getEstimatedPrice(),
+        notes:            `Vehicle: ${form.carType}`,
+      }),
+    }).catch(() => {});
+
+    // Send confirmation emails
     fetch('/api/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name:    formData.name,
-        email:   formData.email,
-        phone:   formData.phone,
-        date:    formData.date ? formData.date.split('T')[0] : '',
-        time:    formData.date ? (formData.date.split('T')[1]?.slice(0, 5) ?? '') : '',
+        name: form.name, email: form.email, phone: fullPhone,
+        date: pickup_date, time: pickup_time,
         service: getServiceSummary(),
+        vehicle: form.carType,
       }),
     }).catch(() => {});
 
-    window.open(`https://wa.me/966XXXXXXXXX?text=${encoded}`, '_blank');
+    // Build WhatsApp message (stored, not auto-opened)
+    const lines = [
+      `🚕 *New Booking — ArabiaCab*`,
+      `───────────────────`,
+      tripType === 'city'
+        ? `📍 Service: City Ride\n🚗 From: ${form.pickup || 'TBD'}\n📌 To: ${form.drop || 'TBD'}`
+        : `📍 Service: Intercity Transfer\n🚗 From: ${form.fromCity}\n📌 To: ${form.toCity}`,
+      `📅 Date/Time: ${form.date || '—'}`,
+      `🚙 Vehicle: ${form.carType}`,
+      `👥 Passengers: ${form.passengers}`,
+      `💰 Estimated: SAR ${getEstimatedPrice()}`,
+      `───────────────────`,
+      `👤 Name: ${form.name}`,
+      `📞 Phone: ${fullPhone}`,
+      form.email ? `📧 Email: ${form.email}` : '',
+    ].filter(Boolean).join('\n');
+
+    setWaMsg(`https://wa.me/966503667424?text=${encodeURIComponent(lines)}`);
+    setLoading(false);
+    setBooked(true);
   };
 
   const tabs = [
-    { id: 'city', label: 'City Ride', icon: MapPin },
-    { id: 'airport', label: 'Airport Transfer', icon: Plane },
-    { id: 'intercity', label: 'Intercity', icon: Globe },
-    { id: 'hajj', label: 'Hajj / Umrah', icon: Star }
+    { id: 'city' as const,      label: 'City Ride',          icon: MapPin },
+    { id: 'intercity' as const, label: 'Intercity Transfer', icon: Globe  },
   ];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.6 }}
-      className={`w-full max-w-5xl mx-auto px-4 md:px-6 relative z-20 ${className || ''}`}
+    <motion.div
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7 }}
+      className={`w-full max-w-5xl mx-auto px-4 md:px-6 ${className ?? ''}`}
     >
-      <div className="bg-[#111111]/90 backdrop-blur-xl border border-[#333333] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden">
-        
+      <div className="rounded-2xl overflow-hidden" style={{ background: '#111111', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+
         {/* Tabs */}
-        <div className="flex flex-wrap border-b border-[#333333] bg-[#0A0A0A]/50">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setTripType(tab.id)}
-                className={`flex-1 min-w-[140px] py-4 px-2 text-sm font-bold flex flex-col md:flex-row items-center justify-center gap-2 transition-all relative ${
-                  tripType === tab.id ? 'text-[#C9A84C] bg-[#111111]' : 'text-gray-400 hover:text-white hover:bg-[#111111]/50'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                {tab.label}
-                {tripType === tab.id && (
-                  <motion.div layoutId="activeWidgetTab" className="absolute top-0 left-0 right-0 h-1 bg-[#C9A84C]" />
-                )}
-              </button>
-            )
-          })}
+        <div className="flex border-b" style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(10,10,10,0.6)' }}>
+          {tabs.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setTripType(id)}
+              className="flex-1 py-4 px-4 text-sm font-semibold flex items-center justify-center gap-2 transition-all relative"
+              style={{ color: tripType === id ? '#CCFF00' : '#666', background: tripType === id ? 'rgba(204,255,0,0.05)' : 'transparent' }}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+              {tripType === id && (
+                <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ background: '#CCFF00' }} />
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* Form Area */}
         <div className="p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            
-            {/* Conditional Fields based on Trip Type */}
-            <AnimatePresence mode="wait">
-              {tripType === 'city' && (
-                <motion.div key="city" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="col-span-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">Pickup Location</label>
-                    <input type="text" name="pickup" onChange={handleChange} placeholder="Hotel, Area, or Street" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none transition-colors" />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">Drop Location</label>
-                    <input type="text" name="drop" onChange={handleChange} placeholder="Destination" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none transition-colors" />
-                  </div>
-                </motion.div>
-              )}
 
-              {tripType === 'airport' && (
-                <motion.div key="airport" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">Direction</label>
-                    <select name="airportDir" onChange={handleChange} className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none appearance-none">
-                      <option value="from">From Airport to City</option>
-                      <option value="to">From City to Airport</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">Airport</label>
-                    <select name="airport" onChange={handleChange} className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none appearance-none">
-                      <option>King Khalid — Riyadh (RUH)</option>
-                      <option>King Abdulaziz — Jeddah (JED)</option>
-                      <option>Prince Mohammed — Madinah (MED)</option>
-                      <option>King Fahd — Dammam (DMM)</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">Flight Number</label>
-                    <input type="text" name="flightNo" onChange={handleChange} placeholder="e.g. SV105" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none" />
-                  </div>
-                </motion.div>
-              )}
+          {/* Trip-specific fields */}
+          <AnimatePresence mode="wait">
+            {tripType === 'city' && (
+              <motion.div key="city" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5"
+              >
+                <div className="flex flex-col gap-2">
+                  <label className={LABEL}>Pickup Location</label>
+                  <input className={INPUT} placeholder="Hotel, street, or area" value={form.pickup} onChange={set('pickup')} />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className={LABEL}>Drop Location</label>
+                  <input className={INPUT} placeholder="Destination" value={form.drop} onChange={set('drop')} />
+                </div>
+              </motion.div>
+            )}
+            {tripType === 'intercity' && (
+              <motion.div key="intercity" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5"
+              >
+                <div className="flex flex-col gap-2">
+                  <label className={LABEL}>From City</label>
+                  <select className={SELECT} value={form.fromCity} onChange={set('fromCity')}>
+                    {['Riyadh', 'Jeddah', 'Makkah', 'Madinah', 'Dammam', 'Abha'].map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className={LABEL}>To City</label>
+                  <select className={SELECT} value={form.toCity} onChange={set('toCity')}>
+                    {['Jeddah', 'Riyadh', 'Makkah', 'Madinah', 'Dammam', 'Abha'].map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-              {tripType === 'intercity' && (
-                <motion.div key="intercity" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">From City</label>
-                    <select name="fromCity" onChange={handleChange} className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none appearance-none">
-                      <option>Riyadh</option><option>Jeddah</option><option>Makkah</option><option>Madinah</option><option>Dammam</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">To City</label>
-                    <select name="toCity" onChange={handleChange} className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none appearance-none">
-                      <option>Jeddah</option><option>Riyadh</option><option>Makkah</option><option>Madinah</option><option>Dammam</option>
-                    </select>
-                  </div>
-                </motion.div>
-              )}
-
-              {tripType === 'hajj' && (
-                <motion.div key="hajj" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">Service Type</label>
-                    <select name="serviceType" onChange={handleChange} className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none appearance-none">
-                      <option>Airport → Makkah Hotel</option>
-                      <option>Makkah ↔ Madinah Transfer</option>
-                      <option>Ziyarat Tour Makkah</option>
-                      <option>Ziyarat Tour Madinah</option>
-                      <option>Full Hajj/Umrah Package</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 uppercase tracking-wider">Hotel / Location Details</label>
-                    <input type="text" name="pickup" onChange={handleChange} placeholder="Hotel Name" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none" />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Common Fields */}
+          {/* Common fields */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-gray-400 uppercase tracking-wider">Date & Time</label>
-              <input type="datetime-local" name="date" onChange={handleChange} className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none [color-scheme:dark]" />
+              <label className={LABEL}>Date & Time</label>
+              <input type="datetime-local" className={INPUT} value={form.date} onChange={set('date')} />
             </div>
-
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-gray-400 uppercase tracking-wider">Vehicle Type</label>
-              <select name="carType" onChange={handleChange} className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none appearance-none">
+              <label className={LABEL}>Vehicle Type</label>
+              <select className={SELECT} value={form.carType} onChange={set('carType')}>
                 <option>Economy Sedan (Camry)</option>
                 <option>Business SUV (Yukon)</option>
                 <option>Luxury Sedan (Lexus/Mercedes)</option>
@@ -286,10 +245,9 @@ export function BookingWidget({ className }: { className?: string }) {
                 <option>Family Van (Hiace)</option>
               </select>
             </div>
-
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-gray-400 uppercase tracking-wider">Passengers</label>
-              <select name="passengers" onChange={handleChange} className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none appearance-none">
+              <label className={LABEL}>Passengers</label>
+              <select className={SELECT} value={form.passengers} onChange={set('passengers')}>
                 <option>1 Passenger</option>
                 <option>2 Passengers</option>
                 <option>3-4 Passengers</option>
@@ -297,48 +255,115 @@ export function BookingWidget({ className }: { className?: string }) {
                 <option>8+ Passengers</option>
               </select>
             </div>
-            
-            {/* Contact Details */}
+          </div>
+
+          {/* Contact details */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-gray-400 uppercase tracking-wider">Your Name</label>
-              <input type="text" name="name" onChange={handleChange} placeholder="Full Name" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none" />
+              <label className={LABEL}>Your Name</label>
+              <input className={INPUT} placeholder="Full name" value={form.name} onChange={set('name')} />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-xs text-gray-400 uppercase tracking-wider">Email Address</label>
-              <input type="email" name="email" onChange={handleChange} placeholder="your@email.com" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-lg py-3 px-4 outline-none" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs text-gray-400 uppercase tracking-wider">WhatsApp Number</label>
+              <label className={LABEL}>WhatsApp Number</label>
               <div className="flex">
-                <span className="bg-[#0A0A0A] border border-[#333333] border-r-0 rounded-l-lg py-3 px-4 text-gray-400 text-sm flex items-center">+966</span>
-                <input type="tel" name="phone" onChange={handleChange} placeholder="5X XXX XXXX" className="w-full bg-[#1A1A1A] border border-[#333333] focus:border-[#C9A84C] text-white text-sm rounded-r-lg py-3 px-4 outline-none" />
+                <span className="flex items-center px-4 text-sm font-medium rounded-l-xl" style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.1)', borderRight: 'none', color: '#888' }}>+966</span>
+                <input type="tel" className="w-full bg-[#1A1A1A] border border-[rgba(255,255,255,0.1)] focus:border-[#CCFF00] text-white text-sm rounded-r-xl py-3 px-4 outline-none transition-colors placeholder:text-[#444]"
+                  placeholder="5X XXX XXXX" value={form.phone} onChange={set('phone')} />
               </div>
             </div>
-
-          </div>
-
-          {/* Instant Price & CTA */}
-          <div className="flex flex-col md:flex-row items-center justify-between bg-[#1A1A1A] border border-[#C9A84C]/30 p-6 rounded-xl gap-6">
-            <div className="flex flex-col">
-              <span className="text-gray-400 text-sm uppercase tracking-wider mb-1">Estimated Fare</span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl text-white font-bold">SAR</span>
-                <span className="text-5xl font-bold font-numbers text-[#C9A84C]">{getEstimatedPrice()}</span>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">* Final price may vary based on exact location.</p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-              <button onClick={generateWhatsAppMessage} className="bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold py-4 px-8 rounded-lg shadow-[0_0_15px_rgba(37,211,102,0.3)] hover:shadow-[0_0_25px_rgba(37,211,102,0.6)] transition-all flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto">
-                <FaWhatsapp className="w-5 h-5" />
-                Book via WhatsApp
-              </button>
-              <button className="bg-transparent border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C]/10 font-bold py-4 px-8 rounded-lg transition-all flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto">
-                <Phone className="w-5 h-5" />
-                Call to Book
-              </button>
+            <div className="flex flex-col gap-2">
+              <label className={LABEL}>Email (optional)</label>
+              <input type="email" className={INPUT} placeholder="you@email.com" value={form.email} onChange={set('email')} />
             </div>
           </div>
+
+          {/* Price + Submit / Success */}
+          <AnimatePresence mode="wait">
+            {booked ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="rounded-xl p-6 text-center"
+                style={{ background: '#0d1a00', border: '1px solid rgba(204,255,0,0.3)' }}
+              >
+                <CheckCircle2 className="w-10 h-10 mx-auto mb-3" style={{ color: '#CCFF00' }} />
+                <p className="text-white font-bold text-lg mb-1" style={{ fontFamily: 'var(--font-syne), sans-serif' }}>
+                  Booking Confirmed!
+                </p>
+                <p className="text-[#888] text-sm mb-5">
+                  Your booking has been saved. Open WhatsApp to connect with our operator.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <a
+                    href={waMsg}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 font-bold rounded-xl px-6 py-3 transition-all hover:scale-[1.02]"
+                    style={{ background: '#25D366', color: '#fff', fontSize: '15px', boxShadow: '0 4px 20px rgba(37,211,102,0.3)' }}
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Open WhatsApp
+                  </a>
+                  <button
+                    onClick={() => { setBooked(false); setWaMsg(''); }}
+                    className="text-sm font-medium transition-colors"
+                    style={{ color: '#555' }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#555'; }}
+                  >
+                    Book Another Ride
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="form"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col md:flex-row items-center gap-5 rounded-xl p-5"
+                style={{ background: '#1A1A1A', border: '1px solid rgba(204,255,0,0.15)' }}
+              >
+                <div className="flex flex-col">
+                  <span className="text-[#666] text-xs uppercase tracking-wider mb-1">Estimated Fare</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-white text-lg font-bold">SAR</span>
+                    <span className="text-[#CCFF00] font-bold" style={{ fontSize: '42px', fontFamily: 'var(--font-bebas-neue), sans-serif', lineHeight: 1 }}>{getEstimatedPrice()}</span>
+                  </div>
+                  <p className="text-[#444] text-xs mt-1">* Final price confirmed by driver</p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto md:ml-auto items-center">
+                  {error && <p className="text-xs" style={{ color: '#ff6b6b' }}>{error}</p>}
+                  {/* Direct WhatsApp chat button */}
+                  <a
+                    href="https://wa.me/966503667424"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 font-semibold rounded-xl px-4 py-3 transition-all hover:scale-[1.02]"
+                    style={{ background: 'rgba(37,211,102,0.12)', border: '1px solid rgba(37,211,102,0.3)', color: '#25D366', fontSize: '13px', whiteSpace: 'nowrap' }}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </a>
+                  <button
+                    onClick={handleConfirm}
+                    disabled={loading}
+                    className="flex items-center justify-center gap-2 font-bold rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-60"
+                    style={{ background: '#CCFF00', color: '#0A0A0A', padding: '14px 28px', fontSize: '15px', boxShadow: '0 4px 20px rgba(204,255,0,0.25)', whiteSpace: 'nowrap' }}
+                    onMouseEnter={(e) => { if (!loading) (e.currentTarget as HTMLElement).style.background = '#B8E600'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#CCFF00'; }}
+                  >
+                    {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : 'Confirm Booking'}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         </div>
       </div>

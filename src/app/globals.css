@@ -6,15 +6,19 @@
 
 @theme inline {
   --color-primary-bg: #0A0A0A;
+  --color-accent-green: #CCFF00;
+  --color-accent-green-2: #B8E600;
   --color-gold-accent: #C9A84C;
-  --color-gold-light: #F0D080;
   --color-surface: #111111;
   --color-surface-light: #1A1A1A;
   --color-text-primary: #FFFFFF;
-  --color-text-muted: #888888;
+  --color-text-secondary: #888888;
+  --color-text-muted: #555555;
   --color-success: #2ECC71;
   --color-whatsapp: #25D366;
 
+  --font-syne: var(--font-syne), sans-serif;
+  --font-inter: var(--font-inter), sans-serif;
   --font-playfair: var(--font-playfair), serif;
   --font-dm-sans: var(--font-dm-sans), sans-serif;
   --font-cairo: var(--font-cairo), sans-serif;
@@ -71,18 +75,18 @@
   --card-foreground: #FFFFFF;
   --popover: #111111;
   --popover-foreground: #FFFFFF;
-  --primary: #C9A84C;
+  --primary: #CCFF00;
   --primary-foreground: #0A0A0A;
   --secondary: #1A1A1A;
   --secondary-foreground: #FFFFFF;
   --muted: #1A1A1A;
   --muted-foreground: #888888;
-  --accent: #C9A84C;
+  --accent: #CCFF00;
   --accent-foreground: #0A0A0A;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #333333;
-  --input: #333333;
-  --ring: #C9A84C;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #1A1A1A;
+  --ring: #CCFF00;
   --radius: 0.5rem;
 }
 
@@ -93,18 +97,18 @@
   --card-foreground: #FFFFFF;
   --popover: #111111;
   --popover-foreground: #FFFFFF;
-  --primary: #C9A84C;
+  --primary: #CCFF00;
   --primary-foreground: #0A0A0A;
   --secondary: #1A1A1A;
   --secondary-foreground: #FFFFFF;
   --muted: #1A1A1A;
   --muted-foreground: #888888;
-  --accent: #C9A84C;
+  --accent: #CCFF00;
   --accent-foreground: #0A0A0A;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: #333333;
-  --input: #333333;
-  --ring: #C9A84C;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #1A1A1A;
+  --ring: #CCFF00;
 }
 
 @layer base {
@@ -113,18 +117,37 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-dm-sans);
+    font-family: var(--font-inter), var(--font-dm-sans), sans-serif;
   }
   html[dir="rtl"] body {
     font-family: var(--font-noto-arabic);
   }
   h1, h2, h3, h4, h5, h6, .font-display {
-    font-family: var(--font-playfair);
+    font-family: var(--font-syne), var(--font-playfair), sans-serif;
   }
-  html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3, html[dir="rtl"] h4, html[dir="rtl"] h5, html[dir="rtl"] h6, html[dir="rtl"] .font-display {
+  html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3,
+  html[dir="rtl"] h4, html[dir="rtl"] h5, html[dir="rtl"] h6,
+  html[dir="rtl"] .font-display {
     font-family: var(--font-cairo);
   }
   .font-numbers {
     font-family: var(--font-bebas-neue);
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
   }
 }
