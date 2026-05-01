@@ -167,6 +167,7 @@ export function Hero() {
               width={320}
               height={96}
               className="h-24 w-auto"
+              priority
             />
           </Link>
 
