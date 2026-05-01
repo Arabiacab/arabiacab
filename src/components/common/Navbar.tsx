@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { Menu, X, Globe } from 'lucide-react';
 
 export function Navbar() {
@@ -43,16 +44,18 @@ export function Navbar() {
           : 'bg-[rgba(15,15,15,0.95)]'
       } backdrop-blur-[20px] border-b border-[rgba(255,255,255,0.06)]`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 h-32 flex items-center justify-between">
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="w-8 h-8 bg-[#CCFF00] rounded-lg flex items-center justify-center">
-            <span className="text-[#0A0A0A] font-bold text-xs leading-none" style={{ fontFamily: 'var(--font-syne), sans-serif' }}>AC</span>
-          </div>
-          <span className="text-white font-bold text-[1.1rem] tracking-tight" style={{ fontFamily: 'var(--font-syne), sans-serif' }}>
-            Arabia<span className="text-[#CCFF00]">Cab</span>
-          </span>
+          <Image
+            src="/logo.png"
+            alt="ArabiaCab Logo"
+            width={360}
+            height={108}
+            className="h-24 w-auto"
+            priority
+          />
         </Link>
 
         {/* Desktop Nav Links */}

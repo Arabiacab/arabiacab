@@ -159,14 +159,15 @@ export function Hero() {
         </div>
 
         {/* ── Header row: logo left, nav pill center ── */}
-        <div className="relative z-20 flex items-center px-6 pt-5" style={{ minHeight: '60px' }}>
+        <div className="relative z-20 flex items-center px-6 pt-5" style={{ minHeight: '140px' }}>
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#CCFF00' }}>
-              <span className="text-[#0A0A0A] font-bold text-[11px]" style={{ fontFamily: 'var(--font-syne), sans-serif' }}>AC</span>
-            </div>
-            <span className="text-white font-bold text-[15px] hidden sm:block" style={{ fontFamily: 'var(--font-syne), sans-serif' }}>
-              Arabia<span style={{ color: '#CCFF00' }}>Cab</span>
-            </span>
+            <Image
+              src="/logo.png"
+              alt="ArabiaCab Logo"
+              width={320}
+              height={96}
+              className="h-24 w-auto"
+            />
           </Link>
 
           <nav

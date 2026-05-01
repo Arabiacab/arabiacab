@@ -1,4 +1,5 @@
 import { Link } from '@/i18n/routing';
+import Image from 'next/image';
 import { Phone, Mail, MapPin } from 'lucide-react';
 
 const footerLinks = {
@@ -36,20 +37,13 @@ export function Footer() {
           {/* Brand — 2 cols wide on large */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 bg-[#CCFF00] rounded-lg flex items-center justify-center">
-                <span
-                  className="text-[#0A0A0A] font-bold text-xs"
-                  style={{ fontFamily: 'var(--font-syne), sans-serif' }}
-                >
-                  AC
-                </span>
-              </div>
-              <span
-                className="text-white font-bold text-[1.05rem]"
-                style={{ fontFamily: 'var(--font-syne), sans-serif' }}
-              >
-                Arabia<span className="text-[#CCFF00]">Cab</span>
-              </span>
+              <Image
+                src="/logo.png"
+                alt="ArabiaCab Logo"
+                width={320}
+                height={96}
+                className="h-24 w-auto"
+              />
             </Link>
             <p className="text-[#666] text-sm leading-relaxed max-w-[280px]">
               Luxury taxi service in Saudi Arabia. Offering premium taxis with trained drivers to ensure your trip goes smoothly. Book now and enjoy a special trip.
