@@ -2,17 +2,16 @@ import { Link } from '@/i18n/routing';
 import { Phone, Mail, MapPin } from 'lucide-react';
 
 const footerLinks = {
-  user: [
-    { label: 'Login', href: '/login' },
-    { label: 'Testimonial', href: '/#testimonials' },
-    { label: 'Line Up Car', href: '/#fleet' },
-    { label: 'Feature', href: '/#features' },
+  pages: [
+    { label: 'Home', href: '/' },
+    { label: 'About', href: '/about' },
+    { label: 'Services', href: '/services' },
+    { label: 'Cities', href: '/cities' },
+    { label: 'Pricing', href: '/pricing' },
   ],
   legal: [
     { label: 'Terms & Conditions', href: '/terms-of-service' },
     { label: 'Privacy Policy', href: '/privacy-policy' },
-    { label: 'System Status', href: '#' },
-    { label: 'Get Own Account', href: '/booking' },
   ],
   cities: [
     { label: 'Riyadh', href: '/riyadh' },
@@ -57,16 +56,16 @@ export function Footer() {
             </p>
           </div>
 
-          {/* User Links */}
+          {/* Page Links */}
           <div>
             <h5
               className="text-white font-semibold text-sm mb-5"
               style={{ fontFamily: 'var(--font-syne), sans-serif' }}
             >
-              User Login
+              Pages
             </h5>
             <ul className="flex flex-col gap-3">
-              {footerLinks.user.map((link) => (
+              {footerLinks.pages.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href as any}
@@ -135,10 +134,15 @@ export function Footer() {
           </p>
 
           <div className="flex flex-wrap items-center gap-5 text-[#555] text-xs">
-            <span className="flex items-center gap-1.5">
+            <a
+              href="https://wa.me/966503667424"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-white transition-colors duration-200"
+            >
               <Phone className="w-3 h-3 text-[#CCFF00]" />
-              +966 5X XXX XXXX
-            </span>
+              +966 503 667 424
+            </a>
             <span className="flex items-center gap-1.5">
               <Mail className="w-3 h-3 text-[#CCFF00]" />
               bookings@arabiacab.com
