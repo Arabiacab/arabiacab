@@ -30,6 +30,7 @@ export function Navbar() {
     { name: locale === 'ar' ? 'عن الشركة' : 'About', href: '/about' },
     { name: locale === 'ar' ? 'الخدمات' : 'Services', href: '/services' },
     { name: locale === 'ar' ? 'المدن' : 'Cities', href: '/cities' },
+    { name: locale === 'ar' ? 'المدونة' : 'Blog', href: '/blog' },
     { name: locale === 'ar' ? 'الأسعار' : 'Pricing', href: '/pricing' },
   ];
 

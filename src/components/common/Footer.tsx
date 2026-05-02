@@ -8,6 +8,7 @@ const footerLinks = {
     { label: 'About', href: '/about' },
     { label: 'Services', href: '/services' },
     { label: 'Cities', href: '/cities' },
+    { label: 'Blog', href: '/blog' },
     { label: 'Pricing', href: '/pricing' },
   ],
   legal: [
@@ -15,11 +16,11 @@ const footerLinks = {
     { label: 'Privacy Policy', href: '/privacy-policy' },
   ],
   cities: [
-    { label: 'Riyadh', href: '/riyadh' },
-    { label: 'Jeddah', href: '/jeddah' },
-    { label: 'Mecca', href: '/mecca' },
-    { label: 'Medina', href: '/medina' },
-    { label: 'Dammam', href: '/dammam' },
+    { label: 'Riyadh', href: '/riyadh-taxi-service' },
+    { label: 'Jeddah', href: '/jeddah-taxi-service' },
+    { label: 'Makkah', href: '/makkah-taxi-service' },
+    { label: 'Madinah', href: '/madinah-taxi-service' },
+    { label: 'Dammam', href: '/dammam-taxi-service' },
   ],
 };
 
@@ -45,9 +46,17 @@ export function Footer() {
                 className="h-24 w-auto"
               />
             </Link>
-            <p className="text-[#666] text-sm leading-relaxed max-w-[280px]">
+            <p className="text-[#666] text-sm leading-relaxed max-w-[280px] mb-6">
               Luxury taxi service in Saudi Arabia. Offering premium taxis with trained drivers to ensure your trip goes smoothly. Book now and enjoy a special trip.
             </p>
+            <div className="flex items-center gap-4 text-xs font-semibold">
+              <span className="flex items-center gap-1.5 text-white/80 bg-white/5 py-1.5 px-3 rounded-full border border-white/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00]"></span> Trusted by 500+ riders
+              </span>
+              <span className="flex items-center gap-1.5 text-white/80 bg-white/5 py-1.5 px-3 rounded-full border border-white/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00]"></span> 24/7 Service
+              </span>
+            </div>
           </div>
 
           {/* Page Links */}

@@ -78,6 +78,53 @@ const homepageJsonLd = {
   },
 };
 
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What cities does Arabia Cab serve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'We serve 15+ cities across Saudi Arabia including Riyadh, Jeddah, Mecca, Medina, Dammam, Khobar, Tabuk, Abha, and more. Our intercity transfer network covers all major routes in the Kingdom.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do I book a city-to-city ride?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Enter your pickup city and destination in the booking form, select your vehicle type, choose date and time, then submit. We confirm your booking within minutes via WhatsApp.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What vehicle types are available?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'We offer Standard Sedan, Premium SUV, Luxury Car, Economy Hatchback, Van/Minibus, and Intercity Sedan options to suit every need and budget.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is payment required upfront?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No upfront payment needed. Pay cash to the driver upon arrival, or use our online payment option at the time of booking for added convenience.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Are your drivers verified?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. Every Arabia Cab driver is police-checked, licensed, and trained for professional service. All vehicles are regularly inspected and maintained to the highest standards.',
+      },
+    },
+  ],
+};
+
 export default async function HomePage({
   params
 }: {
@@ -89,6 +136,8 @@ export default async function HomePage({
   return (
     <main className="min-h-screen flex flex-col bg-[#0A0A0A] overflow-hidden">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ ...homepageJsonLd, '@type': 'TaxiService' }) }} />
       <Hero />
       <FleetShowcase />
       <ExclusiveSavings />

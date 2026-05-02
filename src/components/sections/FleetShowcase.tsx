@@ -157,7 +157,7 @@ export function FleetShowcase() {
                 <div className="relative w-full mb-3 rounded-xl overflow-hidden" style={{ height: '120px', background: 'rgba(255,255,255,0.02)' }}>
                   <Image
                     src={car.image}
-                    alt={car.name}
+                    alt={`${car.name} - Premium Taxi Service in Saudi Arabia`}
                     fill
                     className="object-contain p-2"
                   />

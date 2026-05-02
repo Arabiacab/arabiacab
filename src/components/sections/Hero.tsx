@@ -20,7 +20,7 @@ const FIELD = 'bg-transparent text-white text-sm font-medium outline-none w-full
 const LABEL = { fontSize: '11px', color: 'rgba(255,255,255,0.48)', fontWeight: 500, marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase' as const };
 const DIVIDER = { borderRight: '1px solid rgba(255,255,255,0.1)' };
 
-export function Hero() {
+export function Hero({ isMainPage = true }: { isMainPage?: boolean }) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -127,7 +127,7 @@ export function Hero() {
       {/* ── Hero Card ── */}
       <div
         className="relative overflow-hidden"
-        style={{ background: '#090909', margin: '12px 12px 0', borderRadius: '20px', minHeight: '88vh' }}
+        style={{ background: '#090909', margin: '12px', borderRadius: '20px', minHeight: 'calc(100vh - 24px)' }}
       >
         {/* Background */}
         <div className="absolute inset-0 overflow-hidden">
@@ -199,18 +199,28 @@ export function Hero() {
 
         {/* ── Hero Content ── */}
         <div className="absolute z-10 left-10 right-6 md:right-auto" style={{ bottom: '220px' }}>
-          <motion.h1
-            initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-            className="text-white font-bold mb-3 leading-[1.08]"
-            style={{ fontFamily: 'var(--font-syne), sans-serif', fontSize: 'clamp(34px, 5vw, 60px)', letterSpacing: '-1.5px' }}
-          >
-            Exclusive Rides,<br />Premier Service
-          </motion.h1>
+          {isMainPage ? (
+            <motion.h1
+              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+              className="text-white font-bold mb-3 leading-[1.08]"
+              style={{ fontFamily: 'var(--font-syne), sans-serif', fontSize: 'clamp(34px, 5vw, 60px)', letterSpacing: '-1.5px' }}
+            >
+              Premium Taxi Service<br />in Saudi Arabia
+            </motion.h1>
+          ) : (
+            <motion.h2
+              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+              className="text-white font-bold mb-3 leading-[1.08]"
+              style={{ fontFamily: 'var(--font-syne), sans-serif', fontSize: 'clamp(34px, 5vw, 60px)', letterSpacing: '-1.5px' }}
+            >
+              Premium Taxi Service<br />in Saudi Arabia
+            </motion.h2>
+          )}
           <motion.p
             initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.12 }}
             style={{ color: 'rgba(255,255,255,0.68)', fontSize: '15px', lineHeight: 1.6, maxWidth: '420px', marginTop: '10px' }}
           >
-            Professional city-to-city rides across Saudi Arabia.
+            Book reliable intercity taxi services, airport transfers, and premium rides across Riyadh, Jeddah, Makkah, and Madinah.
           </motion.p>
         </div>
 
@@ -282,6 +292,16 @@ export function Hero() {
           {error && (
             <p className="px-7 pb-3 text-xs" style={{ color: '#ff6b6b' }}>{error}</p>
           )}
+          {/* Urgency Trigger */}
+          <div className="px-7 pb-4 flex items-center justify-between">
+            <p className="text-xs text-[#888] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse"></span>
+              High demand: Quick booking in 30 seconds
+            </p>
+            <p className="text-xs text-[#888] font-medium hidden sm:block">
+              Free cancellation up to 24h before
+            </p>
+          </div>
         </motion.div>
 
       </div>
