@@ -117,7 +117,7 @@ export function FleetShowcase() {
           Choose Your Ride
         </motion.h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 overflow-x-auto car-cards-wrap snap-x snap-mandatory pb-4">
           {cars.map((car, idx) => {
             const isSelected = selectedCar === car.id;
             return (
@@ -129,7 +129,7 @@ export function FleetShowcase() {
                 transition={{ duration: 0.45, delay: idx * 0.07 }}
                 whileHover={{ y: -5 }}
                 onClick={() => handleSelect(car)}
-                className="rounded-2xl p-4 cursor-pointer transition-all duration-300"
+                className="rounded-2xl p-4 cursor-pointer transition-all duration-300 min-w-[260px] md:min-w-0 snap-start shrink-0"
                 style={{
                   background: isSelected ? '#1A2000' : '#1A1A1A',
                   border: `1px solid ${isSelected ? '#CCFF00' : 'rgba(255,255,255,0.06)'}`,

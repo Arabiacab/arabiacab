@@ -59,10 +59,9 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Page Links */}
           <div>
             <h5
-              className="text-white font-semibold text-sm mb-5"
+              className="text-white font-semibold text-sm mb-5 mt-5 md:mt-0"
               style={{ fontFamily: 'var(--font-syne), sans-serif' }}
             >
               Pages
@@ -84,7 +83,7 @@ export function Footer() {
           {/* Legal Links */}
           <div>
             <h5
-              className="text-white font-semibold text-sm mb-5"
+              className="text-white font-semibold text-sm mb-5 mt-5 md:mt-0"
               style={{ fontFamily: 'var(--font-syne), sans-serif' }}
             >
               Legal
@@ -106,7 +105,7 @@ export function Footer() {
           {/* Cities */}
           <div>
             <h5
-              className="text-white font-semibold text-sm mb-5"
+              className="text-white font-semibold text-sm mb-5 mt-5 md:mt-0"
               style={{ fontFamily: 'var(--font-syne), sans-serif' }}
             >
               Cities
@@ -129,28 +128,28 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div
-          className="flex flex-col md:flex-row items-center justify-between gap-4 pt-7"
+          className="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 pt-7 text-center"
           style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
         >
           <p className="text-[#555] text-xs">
             © 2025 ArabiaCab. All Rights Reserved. Licensed in Saudi Arabia 🇸🇦
           </p>
 
-          <div className="flex flex-wrap items-center gap-5 text-[#555] text-xs">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-5 text-[#555] text-xs mt-3 md:mt-0">
             <a
               href="https://wa.me/966503667424"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 hover:text-white transition-colors duration-200"
+              className="flex items-center justify-center gap-1.5 hover:text-white transition-colors duration-200"
             >
               <Phone className="w-3 h-3 text-[#CCFF00]" />
               +966 503 667 424
             </a>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center justify-center gap-1.5">
               <Mail className="w-3 h-3 text-[#CCFF00]" />
               bookings@arabiacab.com
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center justify-center gap-1.5">
               <MapPin className="w-3 h-3 text-[#CCFF00]" />
               Saudi Arabia
             </span>

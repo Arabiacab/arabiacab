@@ -68,7 +68,7 @@ export function FAQSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex gap-2"
+              className="flex flex-col md:flex-row gap-2"
             >
               <input
                 type="email"
@@ -81,7 +81,7 @@ export function FAQSection() {
                 onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
               />
               <button
-                className="px-5 py-3 rounded-xl text-sm font-semibold shrink-0 transition-all hover:shadow-[0_4px_20px_rgba(204,255,0,0.3)] hover:scale-105"
+                className="w-full md:w-auto px-5 py-3 rounded-xl text-sm font-semibold shrink-0 transition-all hover:shadow-[0_4px_20px_rgba(204,255,0,0.3)] hover:scale-105"
                 style={{ background: '#CCFF00', color: '#0A0A0A' }}
               >
                 Submit →
@@ -103,7 +103,7 @@ export function FAQSection() {
               >
                 <button
                   onClick={() => setOpen(open === idx ? null : idx)}
-                  className="w-full flex items-center justify-between py-5 text-left gap-4 group"
+                  className="w-full flex items-center justify-between py-[14px] md:py-5 text-left gap-4 group"
                 >
                   <span
                     className="text-[15px] font-medium transition-colors group-hover:text-white"

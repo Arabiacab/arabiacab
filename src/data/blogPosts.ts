@@ -1,4 +1,32 @@
-export const blogPosts = [
+export interface BlogPost {
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  date: string;
+  author: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  readTime?: string;
+  hasComponent?: boolean;
+}
+
+export const blogPosts: BlogPost[] = [
+  {
+    slug: 'riyadh-to-jeddah-taxi',
+    title: 'Riyadh to Jeddah Taxi 2026 — Price, Distance & Complete Booking Guide',
+    excerpt:
+      'Complete 2026 guide to taking a taxi from Riyadh to Jeddah. Distance 949km, duration 9 hours, price from SAR 350. Compare options, read tips, and book a verified driver with Arabia Cab instantly.',
+    content: '',
+    date: '2026-01-15',
+    author: 'Arabia Cab',
+    readTime: '12 min',
+    metaTitle:
+      'Riyadh to Jeddah Taxi 2026 — Price, Distance & Complete Booking Guide | Arabia Cab',
+    metaDescription:
+      'Complete 2026 guide to taking a taxi from Riyadh to Jeddah. Distance 949km, duration 9 hours, price from SAR 350. Compare options, read tips, and book a verified driver with Arabia Cab instantly.',
+    hasComponent: true,
+  },
   {
     slug: 'best-taxi-service-riyadh-guide',
     title: 'Best Taxi Service in Riyadh – Complete Guide',

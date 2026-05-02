@@ -57,7 +57,7 @@ export function ExclusiveSavings() {
         </div>
 
         {/* Promo Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-5">
           {promos.map((promo, idx) => (
             <motion.div
               key={promo.id}
@@ -65,8 +65,7 @@ export function ExclusiveSavings() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.55, delay: idx * 0.12, ease: [0.22, 1, 0.36, 1] }}
-              className="relative rounded-2xl overflow-hidden group cursor-pointer"
-              style={{ height: '220px' }}
+              className="relative rounded-2xl overflow-hidden group cursor-pointer min-h-[260px] md:min-h-0 md:h-[220px]"
             >
               {/* Background — simulated road/journey aesthetic */}
               <div
@@ -95,33 +94,32 @@ export function ExclusiveSavings() {
               <div className={`absolute inset-0 bg-gradient-to-r ${promo.gradient}`} />
 
               {/* Content */}
-              <div className="relative h-full flex flex-col justify-between p-7">
+              <div className="relative flex flex-col justify-between p-6 md:p-7 min-h-[260px] md:min-h-[220px]">
                 <div>
                   <span
-                    className="inline-block text-[11px] font-semibold uppercase tracking-widest mb-3"
+                    className="inline-block text-[10px] md:text-[11px] font-semibold uppercase tracking-widest mb-3"
                     style={{ color: 'rgba(255,255,255,0.55)' }}
                   >
                     {promo.label}
                   </span>
                   <div
-                    className="font-bold leading-none mb-2"
+                    className="font-bold leading-none mb-2 text-[42px] md:text-[64px]"
                     style={{
                       fontFamily: 'var(--font-syne), sans-serif',
-                      fontSize: '64px',
                       color: '#CCFF00',
                       lineHeight: 1,
                     }}
                   >
                     {promo.discount}
                   </div>
-                  <p className="text-white font-semibold text-[15px]">{promo.route}</p>
+                  <p className="text-white font-semibold text-[14px] md:text-[15px]">{promo.route}</p>
                 </div>
 
-                <div className="flex items-end justify-between">
-                  <p className="text-[#888] text-[13px] max-w-[200px]">{promo.desc}</p>
+                <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mt-4">
+                  <p className="text-[#888] text-[12px] md:text-[13px] max-w-[220px]">{promo.desc}</p>
                   <Link
                     href={promo.href as any}
-                    className="shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 hover:scale-105 hover:shadow-[0_4px_20px_rgba(204,255,0,0.3)]"
+                    className="shrink-0 px-5 py-2.5 rounded-full text-[13px] font-bold transition-all duration-200 hover:scale-105 hover:shadow-[0_4px_20px_rgba(204,255,0,0.3)]"
                     style={{ background: '#CCFF00', color: '#0A0A0A' }}
                   >
                     Book Now

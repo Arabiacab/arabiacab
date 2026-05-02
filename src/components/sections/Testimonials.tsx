@@ -1,181 +1,145 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
+import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
+import type { Testimonial } from '@/components/ui/testimonials-columns-1';
 
-const allReviews = [
+const testimonials: Testimonial[] = [
   {
-    id: 1,
-    name: 'Guillermo Rauch',
+    text: 'Booked a sedan from Riyadh to Jeddah and the driver was at my door 10 minutes early. Smooth ride the whole way, fixed price, no surprises. Will use Arabia Cab every time.',
+    name: 'Mohammed Al-Qahtani',
     city: 'Riyadh',
-    initials: 'GR',
+    initials: 'MQ',
     color: '#0066FF',
-    text: 'I am very impressed with this taxi booking service! The booking process was easy, fast, and most importantly the cars provided were truly luxurious. I felt like a celebrity. Thank you so much for this unforgettable experience.',
   },
   {
-    id: 2,
-    name: 'Ayaka Kamisato',
+    text: 'Airport transfer from King Khalid was flawless. Driver was holding a sign, helped with luggage, and got me to my hotel with time to spare. Genuinely professional service.',
+    name: 'Fatima Al-Dosari',
     city: 'Jeddah',
-    initials: 'AK',
+    initials: 'FD',
     color: '#CCFF00',
-    text: 'I have used this taxi booking service several times and I am always satisfied with my experience. The cars are always clean and comfortable, and the drivers are always friendly and professional. Highly recommended!',
   },
   {
-    id: 3,
-    name: 'Luna M.',
+    text: 'Traveled with my whole family to Mecca for Umrah. The minivan was spotless, the driver was respectful and patient with our children. Exactly what we needed for a blessed journey.',
+    name: 'Abdullah Al-Ghamdi',
     city: 'Mecca',
-    initials: 'LM',
+    initials: 'AG',
     color: '#FF6B35',
-    text: 'I recently used this taxi booking service for my business trip. The quick and easy booking process made it very efficient, and the luxury cars added an elegant touch to my travel experience. Will definitely use again!',
   },
   {
-    id: 4,
-    name: 'Ayoto Kamisato',
-    city: 'Dammam',
-    initials: 'AK',
-    color: '#9B59B6',
-    text: 'I cannot emphasize enough how extraordinary the experience of using this service was. The cars are the latest models with full amenities, making me feel like a VIP. This service provides outstanding added value to every trip.',
-  },
-  {
-    id: 5,
-    name: 'Diluc Maulana',
-    city: 'Medina',
-    initials: 'DM',
-    color: '#0066FF',
-    text: 'I always look for a combination of comfort and style in every journey, and this taxi booking service delivers both perfectly. From the range of luxurious cars to the friendly customer service, everything makes me feel truly valued.',
-  },
-  {
-    id: 6,
-    name: 'Diego L.',
-    city: 'Abha',
-    initials: 'DL',
-    color: '#CCFF00',
-    text: 'I have used this taxi booking service for my airport transfers several times. The cars are always on time and in pristine condition. The drivers are always professional and friendly, making my journey truly enjoyable.',
-  },
-  {
-    id: 7,
-    name: 'Furnia',
-    city: 'Khobar',
-    initials: 'FN',
-    color: '#FF6B35',
-    text: 'As someone who values both comfort and style, I was delighted with the luxury car I booked. It offered the finest of luxury rides, the attention to detail and the service provided added a touch of class to the whole experience.',
-  },
-  {
-    id: 8,
-    name: 'Isabella S.',
+    text: 'I use Arabia Cab for all my client meetings across Riyadh. The premium SUV is always on time and the drivers dress professionally. It reflects well on my business.',
+    name: 'Sarah Al-Rashid',
     city: 'Riyadh',
-    initials: 'IS',
+    initials: 'SR',
     color: '#9B59B6',
-    text: 'This taxi booking service redefines luxury travel. The fleet of luxury cars available and the over selected for my journey exceeded all expectations. The ideal solution for anyone seeking a comfortable and stylish journey.',
   },
   {
-    id: 9,
-    name: 'Emily W.',
+    text: 'Took my parents from Madinah to Jeddah. The car was comfortable, the route was smooth, and the driver stopped for breaks when needed. Arabia Cab understood what family travel means.',
+    name: 'Omar Al-Maliki',
+    city: 'Medina',
+    initials: 'OM',
+    color: '#2ECC71',
+  },
+  {
+    text: 'Luxury car for a wedding event in Jeddah. The interior was immaculate and the driver was punctual to the minute. Everyone asked who arranged the transport. Arabia Cab.',
+    name: 'Nour Al-Saud',
     city: 'Jeddah',
-    initials: 'EW',
-    color: '#0066FF',
-    text: 'I recently used this booking service for a special occasion, and I couldn\'t have been happier with the experience. The luxury car provided added a touch of elegance to my journey. Top class, top service — simply unmatched!',
+    initials: 'NS',
+    color: '#E74C3C',
+  },
+  {
+    text: 'Best intercity taxi service I have used in Saudi Arabia. Booking took 60 seconds, the price was confirmed upfront, and the driver called me the night before to confirm. Excellent.',
+    name: 'Khalid Al-Zahrani',
+    city: 'Dammam',
+    initials: 'KZ',
+    color: '#1ABC9C',
+  },
+  {
+    text: 'I was nervous about a long trip to Abha but the driver made it easy. Comfortable, safe, and arrived right on schedule. I would not travel intercity any other way now.',
+    name: 'Reem Al-Shehri',
+    city: 'Khobar',
+    initials: 'RS',
+    color: '#F39C12',
+  },
+  {
+    text: 'Arabia Cab is simply the most reliable option for traveling between Saudi cities. Fixed pricing, verified drivers, and door-to-door service — everything you need, nothing you do not.',
+    name: 'Tariq Al-Otaibi',
+    city: 'Abha',
+    initials: 'TO',
+    color: '#8E44AD',
   },
 ];
 
-export function Testimonials() {
-  const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? allReviews : allReviews.slice(0, 6);
+const firstColumn = testimonials.slice(0, 3);
+const secondColumn = testimonials.slice(3, 6);
+const thirdColumn = testimonials.slice(6, 9);
 
+export function Testimonials() {
   return (
-    <section className="py-20 md:py-28 bg-[#0A0A0A]">
+    <section className="py-20 md:py-28 bg-[#0A0A0A] overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-white font-bold"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center text-center mb-14"
+        >
+          {/* Badge */}
+          <div
+            className="mb-5 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
             style={{
-              fontFamily: 'var(--font-syne), sans-serif',
-              fontSize: 'clamp(26px, 3vw, 40px)',
-              letterSpacing: '-1px',
+              background: 'rgba(204,255,0,0.08)',
+              border: '1px solid rgba(204,255,0,0.25)',
+              color: '#CCFF00',
             }}
           >
-            What our<br className="hidden md:block" /> enchanted riders say
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-[#888] text-sm max-w-xs"
-          >
-            Here is what satisfied customers who have experienced ArabiaCab have to say about our service.
-          </motion.p>
-        </div>
-
-        {/* Reviews Grid */}
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-          {visible.map((review, idx) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.07, ease: [0.22, 1, 0.36, 1] }}
-              className="break-inside-avoid rounded-2xl p-6 mb-4"
-              style={{
-                background: '#1A1A1A',
-                border: '1px solid rgba(255,255,255,0.06)',
-              }}
-            >
-              {/* Stars */}
-              <div className="flex gap-0.5 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-[#CCFF00] text-[#CCFF00]" />
-                ))}
-              </div>
-
-              {/* Review text */}
-              <p
-                className="mb-5 leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.68)', fontSize: '14px', lineHeight: 1.65 }}
-              >
-                {review.text}
-              </p>
-
-              {/* Reviewer */}
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                  style={{
-                    background: review.color,
-                    color: review.color === '#CCFF00' ? '#0A0A0A' : '#FFFFFF',
-                  }}
-                >
-                  {review.initials}
-                </div>
-                <div>
-                  <p className="text-white text-sm font-semibold leading-tight">{review.name}</p>
-                  <p className="text-[#666] text-xs">{review.city}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Show More */}
-        {!showAll && (
-          <div className="flex justify-center mt-10">
-            <button
-              onClick={() => setShowAll(true)}
-              className="px-8 py-3 rounded-full text-sm font-medium text-white transition-all duration-200 hover:bg-[rgba(255,255,255,0.06)]"
-              style={{ border: '1px solid rgba(255,255,255,0.15)' }}
-            >
-              Show More
-            </button>
+            Rider Reviews
           </div>
-        )}
+
+          <h2
+            className="text-white font-bold mb-4"
+            style={{
+              fontFamily: 'var(--font-syne), sans-serif',
+              fontSize: 'clamp(26px, 4vw, 44px)',
+              letterSpacing: '-1px',
+              lineHeight: 1.15,
+            }}
+          >
+            What our riders say
+          </h2>
+          <p className="text-[#666] text-base max-w-md leading-relaxed">
+            Thousands of travelers across Saudi Arabia trust Arabia Cab for intercity rides,
+            airport transfers, and daily travel.
+          </p>
+        </motion.div>
+
+        {/* Scrolling columns */}
+        <div
+          className="flex justify-center gap-4"
+          style={{
+            maskImage:
+              'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)',
+            WebkitMaskImage:
+              'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)',
+            maxHeight: '680px',
+            overflow: 'hidden',
+          }}
+        >
+          <TestimonialsColumn testimonials={firstColumn} duration={18} />
+          <TestimonialsColumn
+            testimonials={secondColumn}
+            duration={22}
+            className="hidden md:block"
+          />
+          <TestimonialsColumn
+            testimonials={thirdColumn}
+            duration={20}
+            className="hidden lg:block"
+          />
+        </div>
 
       </div>
     </section>

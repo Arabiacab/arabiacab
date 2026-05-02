@@ -151,3 +151,41 @@
     transition: none !important;
   }
 }
+
+@media (max-width: 768px) {
+  /* Hide scrollbars on horizontal scroll */
+  .carousel-track,
+  .car-cards-wrap,
+  .reviews-wrap,
+  .tabs-wrap {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .carousel-track::-webkit-scrollbar,
+  .car-cards-wrap::-webkit-scrollbar,
+  .reviews-wrap::-webkit-scrollbar,
+  .tabs-wrap::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Touch friendly tap targets */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent horizontal overflow */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Section padding reduction */
+  section {
+    padding: 48px 20px !important;
+  }
+
+  /* Section headings */
+  h2 {
+    font-size: clamp(24px, 6vw, 32px) !important;
+  }
+}

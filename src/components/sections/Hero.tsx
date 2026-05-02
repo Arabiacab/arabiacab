@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Globe, ArrowUpRight, ArrowRight, Loader2 } from 'lucide-react';
-import { Link, usePathname, useRouter } from '@/i18n/routing';
-import { useLocale } from 'next-intl';
+import { Loader2 } from 'lucide-react';
+import { Link } from '@/i18n/routing';
 
 
 const NAV_LINKS = [
@@ -16,15 +15,8 @@ const NAV_LINKS = [
   { label: 'Pricing', href: '/pricing' },
 ];
 
-const FIELD = 'bg-transparent text-white text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark]';
-const LABEL = { fontSize: '11px', color: 'rgba(255,255,255,0.48)', fontWeight: 500, marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase' as const };
-const DIVIDER = { borderRight: '1px solid rgba(255,255,255,0.1)' };
 
 export function Hero({ isMainPage = true }: { isMainPage?: boolean }) {
-  const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
-
   // Row 1 — trip details
   const [pickup, setPickup]           = useState('');
   const [destination, setDestination] = useState('');
@@ -38,9 +30,6 @@ export function Hero({ isMainPage = true }: { isMainPage?: boolean }) {
 
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
-
-  const toggleLanguage = () =>
-    router.replace(pathname, { locale: locale === 'en' ? 'ar' : 'en' });
 
   const handleConfirm = async () => {
     if (!name.trim()) { setError('Please enter your name.'); return; }
@@ -103,38 +92,15 @@ export function Hero({ isMainPage = true }: { isMainPage?: boolean }) {
 
   return (
     <>
-      {/* ── Fixed "Book a Ride" button ── */}
-      <Link
-        href="/booking"
-        className="fixed z-[1002] flex items-center gap-2 font-bold text-[#0A0A0A] transition-all duration-200 hover:scale-[1.02]"
-        style={{
-          top: '16px', right: '16px',
-          background: '#CCFF00',
-          borderRadius: '16px',
-          padding: '14px 28px',
-          fontSize: '15px',
-          fontWeight: 700,
-          fontFamily: 'var(--font-syne), sans-serif',
-          boxShadow: '0 4px 20px rgba(204,255,0,0.32)',
-        }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#B8E600'; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#CCFF00'; }}
-      >
-        {locale === 'ar' ? 'احجز رحلة' : 'Book a Ride'}
-        <ArrowUpRight className="w-4 h-4" />
-      </Link>
-
       {/* ── Hero Card ── */}
       <div
-        className="relative overflow-hidden"
-        style={{ background: '#090909', margin: '12px', borderRadius: '20px', minHeight: 'calc(100vh - 24px)' }}
+        className="relative overflow-hidden flex flex-col md:block bg-[#090909] m-0 md:m-3 rounded-none md:rounded-[20px] min-h-0 md:min-h-[calc(100vh-24px)]"
       >
         {/* Background */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Car — drives in from right, then floats */}
           <motion.div
-            className="absolute right-0 top-0 bottom-0"
-            style={{ width: '85%' }}
+            className="absolute inset-0 md:left-auto md:right-0 md:top-0 md:bottom-0 w-full md:w-[85%]"
             initial={{ x: 160, opacity: 0, scale: 0.94 }}
             animate={{ x: 0, opacity: 1, scale: 1 }}
             transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
@@ -146,20 +112,19 @@ export function Hero({ isMainPage = true }: { isMainPage?: boolean }) {
             >
               <Image
                 src="/cars/gmc_yukon.png" alt="" fill priority
-                className="object-contain"
-                style={{ objectPosition: 'center 75%', transform: 'scale(1.18)', transformOrigin: 'center bottom' }}
+                className="object-contain md:object-contain object-[center_top] md:object-[center_75%] scale-[1.3] md:scale-[1.18] origin-center md:origin-[center_bottom] opacity-50 md:opacity-100 mt-20 md:mt-0"
               />
             </motion.div>
           </motion.div>
 
           {/* Bottom fade for booking bar readability */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 45%, rgba(10,10,12,0.75) 75%, rgba(10,10,12,0.97) 100%)' }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(10,10,12,0.9)] md:from-transparent md:via-transparent md:to-[rgba(10,10,12,0.97)]" />
           {/* Subtle left fade so text stays readable over the car */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(10,10,12,0.72) 0%, rgba(10,10,12,0.28) 35%, transparent 60%)' }} />
+          <div className="absolute inset-0 bg-gradient-to-r from-[rgba(10,10,12,0.8)] via-[rgba(10,10,12,0.4)] to-transparent md:from-[rgba(10,10,12,0.72)] md:via-[rgba(10,10,12,0.28)]" />
         </div>
 
-        {/* ── Header row: logo left, nav pill center ── */}
-        <div className="relative z-20 flex items-center px-6 pt-5" style={{ minHeight: '140px' }}>
+        {/* ── Header row: logo left, nav pill center (Desktop only) ── */}
+        <div className="relative z-20 hidden md:flex items-center px-6 pt-5" style={{ minHeight: '140px' }}>
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image
               src="/logo.png"
@@ -185,20 +150,11 @@ export function Hero({ isMainPage = true }: { isMainPage?: boolean }) {
                 {link.label}
               </Link>
             ))}
-            <button onClick={toggleLanguage}
-              className="flex items-center gap-1.5 text-sm font-medium transition-colors"
-              style={{ color: 'rgba(255,255,255,0.6)' }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#FFFFFF'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)'; }}
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>{locale === 'en' ? 'عربي' : 'EN'}</span>
-            </button>
           </nav>
         </div>
 
         {/* ── Hero Content ── */}
-        <div className="absolute z-10 left-10 right-6 md:right-auto" style={{ bottom: '220px' }}>
+        <div className="relative md:absolute z-10 px-5 md:px-0 md:left-10 md:right-auto pt-[100px] pb-10 md:pt-0 md:bottom-[220px]">
           {isMainPage ? (
             <motion.h1
               initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
@@ -227,74 +183,71 @@ export function Hero({ isMainPage = true }: { isMainPage?: boolean }) {
         {/* ── Two-Row Booking Form ── */}
         <motion.div
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
-          className="absolute bottom-0 left-0 right-0 z-20"
-          style={{ background: 'rgba(22,22,22,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderTop: '1px solid rgba(255,255,255,0.09)', borderRadius: '0 0 20px 20px' }}
+          className="relative md:absolute bottom-0 left-0 right-0 z-20 bg-[rgba(15,15,15,0.95)] md:bg-[rgba(22,22,22,0.82)] backdrop-blur-[20px] md:backdrop-blur-[24px] border-t border-[rgba(255,255,255,0.1)] md:border-[rgba(255,255,255,0.09)] rounded-t-[20px] md:rounded-t-none md:rounded-b-[20px] pt-5 px-5 pb-8 md:p-0"
         >
           {/* Row 1 — Trip details */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0"
-            style={{ padding: '16px 28px 0', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0 md:px-7 md:pt-4 border-b-0 md:border-b border-[rgba(255,255,255,0.07)]"
           >
-            <div className="flex-1 pb-4 md:pb-3 md:pr-5" style={DIVIDER}>
-              <p style={LABEL}>Pick Up</p>
-              <input className={FIELD} placeholder="Pickup city or address" value={pickup} onChange={e => setPickup(e.target.value)} />
+            <div className="w-full pb-3 md:flex-1 md:pr-5 border-b md:border-b-0 border-[rgba(255,255,255,0.08)] md:border-r md:border-[rgba(255,255,255,0.1)]">
+              <p className="text-[10px] md:text-[11px] text-white/40 md:text-white/48 uppercase tracking-[0.08em] md:tracking-[0.05em] font-medium mb-1">Pick Up</p>
+              <input className="bg-transparent text-white text-[15px] md:text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark] py-1 md:py-0" placeholder="Pickup city or address" value={pickup} onChange={e => setPickup(e.target.value)} />
             </div>
-            <div className="flex-1 pb-4 md:pb-3 md:px-5" style={DIVIDER}>
-              <p style={LABEL}>Destination</p>
-              <input className={FIELD} placeholder="Drop-off city or address" value={destination} onChange={e => setDestination(e.target.value)} />
+            <div className="w-full py-3 md:pb-3 md:pt-0 md:flex-1 md:px-5 border-b md:border-b-0 border-[rgba(255,255,255,0.08)] md:border-r md:border-[rgba(255,255,255,0.1)]">
+              <p className="text-[10px] md:text-[11px] text-white/40 md:text-white/48 uppercase tracking-[0.08em] md:tracking-[0.05em] font-medium mb-1">Destination</p>
+              <input className="bg-transparent text-white text-[15px] md:text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark] py-1 md:py-0" placeholder="Drop-off city or address" value={destination} onChange={e => setDestination(e.target.value)} />
             </div>
-            <div className="flex-1 pb-4 md:pb-3 md:px-5" style={DIVIDER}>
-              <p style={LABEL}>Date</p>
-              <input type="date" className={FIELD} value={date} onChange={e => setDate(e.target.value)} />
-            </div>
-            <div className="flex-1 pb-4 md:pb-3 md:pl-5">
-              <p style={LABEL}>Time</p>
-              <input type="time" className={FIELD} value={time} onChange={e => setTime(e.target.value)} />
+            <div className="grid grid-cols-2 gap-4 py-3 md:py-0 md:flex md:flex-1 w-full border-b md:border-b-0 border-[rgba(255,255,255,0.08)]">
+              <div className="w-full md:flex-1 md:px-5 md:border-r md:border-[rgba(255,255,255,0.1)] md:pb-3">
+                <p className="text-[10px] md:text-[11px] text-white/40 md:text-white/48 uppercase tracking-[0.08em] md:tracking-[0.05em] font-medium mb-1">Date</p>
+                <input type="date" className="bg-transparent text-white text-[15px] md:text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark] py-1 md:py-0" value={date} onChange={e => setDate(e.target.value)} />
+              </div>
+              <div className="w-full md:flex-1 md:pl-5 md:pb-3">
+                <p className="text-[10px] md:text-[11px] text-white/40 md:text-white/48 uppercase tracking-[0.08em] md:tracking-[0.05em] font-medium mb-1">Time</p>
+                <input type="time" className="bg-transparent text-white text-[15px] md:text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark] py-1 md:py-0" value={time} onChange={e => setTime(e.target.value)} />
+              </div>
             </div>
           </div>
 
           {/* Row 2 — Contact details + submit */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0"
-            style={{ padding: '0 28px 16px' }}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-0 md:px-7 md:pb-4"
           >
-            <div className="flex-1 pt-3 md:pr-5" style={DIVIDER}>
-              <p style={LABEL}>Your Name</p>
-              <input className={FIELD} placeholder="Full name" value={name} onChange={e => setName(e.target.value)} />
+            <div className="w-full py-3 md:flex-1 md:pr-5 border-b md:border-b-0 border-[rgba(255,255,255,0.08)] md:border-r md:border-[rgba(255,255,255,0.1)]">
+              <p className="text-[10px] md:text-[11px] text-white/40 md:text-white/48 uppercase tracking-[0.08em] md:tracking-[0.05em] font-medium mb-1">Your Name</p>
+              <input className="bg-transparent text-white text-[15px] md:text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark] py-1 md:py-0" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} />
             </div>
-            <div className="flex-1 pt-3 md:px-5" style={DIVIDER}>
-              <p style={LABEL}>WhatsApp</p>
-              <div className="flex items-center gap-1">
-                <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13px', fontWeight: 500 }}>+966</span>
-                <input className={FIELD} placeholder="5X XXX XXXX" value={phone} onChange={e => setPhone(e.target.value)} />
+            <div className="w-full py-3 md:flex-1 md:px-5 border-b md:border-b-0 border-[rgba(255,255,255,0.08)] md:border-r md:border-[rgba(255,255,255,0.1)]">
+              <p className="text-[10px] md:text-[11px] text-white/40 md:text-white/48 uppercase tracking-[0.08em] md:tracking-[0.05em] font-medium mb-1">WhatsApp</p>
+              <div className="flex items-center gap-1 py-1 md:py-0">
+                <span className="text-white/45 text-[15px] md:text-[13px] font-medium">+966</span>
+                <input className="bg-transparent text-white text-[15px] md:text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark]" placeholder="5X XXX XXXX" value={phone} onChange={e => setPhone(e.target.value)} />
               </div>
             </div>
-            <div className="flex-1 pt-3 md:px-5" style={DIVIDER}>
-              <p style={LABEL}>Email (optional)</p>
-              <input type="email" className={FIELD} placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+            <div className="w-full py-3 md:flex-1 md:px-5 border-b border-[rgba(255,255,255,0.08)] md:border-b-0 md:border-r-0">
+              <p className="text-[10px] md:text-[11px] text-white/40 md:text-white/48 uppercase tracking-[0.08em] md:tracking-[0.05em] font-medium mb-1">Email (optional)</p>
+              <input type="email" className="bg-transparent text-white text-[15px] md:text-sm font-medium outline-none w-full placeholder:text-[#444] [color-scheme:dark] py-1 md:py-0" placeholder="you@email.com" value={email} onChange={e => setEmail(e.target.value)} />
             </div>
-            <div className="pt-3 md:pl-5 flex items-end">
+            <div className="w-full pt-4 md:pt-0 md:pl-5 md:flex-shrink-0 md:w-auto flex items-center">
               <button
                 onClick={handleConfirm}
                 disabled={loading}
-                className="flex items-center gap-2 font-bold text-[#0A0A0A] rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-60 whitespace-nowrap"
-                style={{ background: '#CCFF00', padding: '12px 22px', fontSize: '14px', boxShadow: '0 4px 20px rgba(204,255,0,0.25)' }}
-                onMouseEnter={(e) => { if (!loading) (e.currentTarget as HTMLElement).style.background = '#B8E600'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#CCFF00'; }}
+                className="flex items-center justify-center w-full md:w-auto gap-2 font-bold text-[#0A0A0A] rounded-[12px] md:rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-60 whitespace-nowrap bg-[#CCFF00] p-[14px] md:px-6 md:py-[10px] text-[15px] md:text-[13px] shadow-[0_4px_20px_rgba(204,255,0,0.25)]"
               >
                 {loading
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
-                  : 'Confirm Booking'
+                  : <span className="md:hidden">Find My Ride →</span>
                 }
+                {!loading && <span className="hidden md:inline">Confirm Booking</span>}
               </button>
             </div>
           </div>
 
           {/* Error message */}
           {error && (
-            <p className="px-7 pb-3 text-xs" style={{ color: '#ff6b6b' }}>{error}</p>
+            <p className="px-0 md:px-7 pb-3 text-xs text-[#ff6b6b] mt-2 md:mt-0">{error}</p>
           )}
           {/* Urgency Trigger */}
-          <div className="px-7 pb-4 flex items-center justify-between">
-            <p className="text-xs text-[#888] font-medium flex items-center gap-1.5">
+          <div className="px-0 md:px-7 pb-4 md:pb-4 pt-4 md:pt-0 flex items-center justify-between">
+            <p className="text-[11px] md:text-xs text-[#888] font-medium flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse"></span>
               High demand: Quick booking in 30 seconds
             </p>

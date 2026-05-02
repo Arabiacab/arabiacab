@@ -1,16 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLocale } from 'next-intl';
-import { Link, usePathname, useRouter } from '@/i18n/routing';
+import { Link } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+
+const navLinks = [
+  { name: 'Home',    href: '/' },
+  { name: 'About',   href: '/about' },
+  { name: 'Services',href: '/services' },
+  { name: 'Cities',  href: '/cities' },
+  { name: 'Blog',    href: '/blog' },
+  { name: 'Pricing', href: '/pricing' },
+];
 
 export function Navbar() {
-  const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -20,20 +25,6 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleLanguage = () => {
-    const nextLocale = locale === 'en' ? 'ar' : 'en';
-    router.replace(pathname, { locale: nextLocale });
-  };
-
-  const navLinks = [
-    { name: locale === 'ar' ? 'الرئيسية' : 'Home', href: '/' },
-    { name: locale === 'ar' ? 'عن الشركة' : 'About', href: '/about' },
-    { name: locale === 'ar' ? 'الخدمات' : 'Services', href: '/services' },
-    { name: locale === 'ar' ? 'المدن' : 'Cities', href: '/cities' },
-    { name: locale === 'ar' ? 'المدونة' : 'Blog', href: '/blog' },
-    { name: locale === 'ar' ? 'الأسعار' : 'Pricing', href: '/pricing' },
-  ];
-
   return (
     <motion.nav
       initial={{ y: -80 }}
@@ -42,19 +33,19 @@ export function Navbar() {
       className={`sticky top-0 w-full z-[1000] transition-all duration-300 ${
         isScrolled
           ? 'bg-[rgba(10,10,10,0.98)] shadow-[0_4px_24px_rgba(0,0,0,0.4)]'
-          : 'bg-[rgba(15,15,15,0.95)]'
-      } backdrop-blur-[20px] border-b border-[rgba(255,255,255,0.06)]`}
+          : 'bg-[rgba(10,10,10,0.95)]'
+      } backdrop-blur-[16px] border-b border-[rgba(255,255,255,0.06)]`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 h-32 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-5 md:px-12 h-[72px] flex items-center justify-between">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
+        <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/logo.png"
             alt="ArabiaCab Logo"
             width={360}
             height={108}
-            className="h-24 w-auto"
+            className="h-[36px] md:h-[44px] w-auto object-contain"
             priority
           />
         </Link>
@@ -72,72 +63,80 @@ export function Navbar() {
           ))}
         </div>
 
-        {/* Desktop Right Side */}
-        <div className="hidden md:flex items-center gap-4">
-          <button
-            onClick={toggleLanguage}
-            className="flex items-center gap-1.5 text-[#888888] hover:text-white transition-colors text-sm font-medium"
-          >
-            <Globe className="w-4 h-4" />
-            <span>{locale === 'en' ? 'عربي' : 'EN'}</span>
-          </button>
+        {/* Desktop CTA */}
+        <div className="hidden md:flex items-center">
           <Link
             href="/booking"
             className="bg-[#CCFF00] hover:bg-[#B8E600] text-[#0A0A0A] rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(204,255,0,0.25)]"
           >
-            {locale === 'ar' ? 'احجز رحلة' : 'Book a Ride'}
+            Book a Ride
           </Link>
         </div>
 
-        {/* Mobile Controls */}
-        <div className="md:hidden flex items-center gap-3">
-          <button
-            onClick={toggleLanguage}
-            className="text-[#888888] hover:text-white transition-colors p-1"
-            aria-label="Toggle language"
-          >
-            <Globe className="w-4 h-4" />
-          </button>
-          <button
-            className="text-white p-1"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden flex items-center justify-center text-white"
+          style={{ width: '40px', height: '40px', background: 'rgba(255,255,255,0.06)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden bg-[rgba(10,10,10,0.99)] border-b border-[rgba(255,255,255,0.06)] overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="md:hidden fixed inset-0 w-[100vw] h-[100vh] bg-[#0A0A0A] z-[9999] flex flex-col p-0"
           >
-            <div className="flex flex-col px-6 py-5 gap-1">
+            {/* Header row */}
+            <div className="flex items-center justify-between px-5 h-[72px] border-b border-[rgba(255,255,255,0.08)] shrink-0">
+              <Link href="/" className="flex items-center shrink-0" onClick={() => setIsMobileMenuOpen(false)}>
+                <Image src="/logo.png" alt="ArabiaCab Logo" width={360} height={108} className="h-[36px] w-auto object-contain" />
+              </Link>
+              <button
+                className="flex items-center justify-center text-white"
+                style={{ width: '40px', height: '40px', background: 'rgba(255,255,255,0.06)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Nav links */}
+            <div className="flex flex-col flex-1 overflow-y-auto pt-4 pb-24">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href as any}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-[#888888] hover:text-white transition-colors py-3 text-base font-medium border-b border-[rgba(255,255,255,0.05)] last:border-0"
+                  className="block text-white transition-colors border-b border-[rgba(255,255,255,0.06)] px-7 py-[18px] hover:text-[#CCFF00]"
+                  style={{ fontSize: '32px', fontWeight: 700, fontFamily: 'var(--font-syne), sans-serif' }}
                 >
                   {link.name}
                 </Link>
               ))}
-              <div className="pt-4">
-                <Link
-                  href="/booking"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full bg-[#CCFF00] hover:bg-[#B8E600] text-[#0A0A0A] rounded-full px-6 py-3 text-sm font-semibold text-center transition-colors"
-                >
-                  {locale === 'ar' ? 'احجز رحلة' : 'Book a Ride'}
-                </Link>
-              </div>
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="mt-auto p-7 shrink-0 bg-[#0A0A0A] border-t border-[rgba(255,255,255,0.06)] relative z-10 pb-12">
+              <Link
+                href="/booking"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block w-full text-[#0A0A0A] text-center"
+                style={{ background: '#CCFF00', borderRadius: '14px', padding: '18px', fontSize: '17px', fontWeight: 700 }}
+              >
+                Book a Ride
+              </Link>
+              <p className="text-center mt-3" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
+                No upfront payment · Free cancellation
+              </p>
             </div>
           </motion.div>
         )}

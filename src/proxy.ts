@@ -1,20 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
-import { createHmac } from 'crypto';
-
-const intlMiddleware = createMiddleware(routing);
 
 const SECRET = process.env.ADMIN_JWT_SECRET ?? 'arabiacab-admin-secret-key-2024-change-in-prod';
 
-function verifyAdminToken(token: string): boolean {
+async function verifyAdminToken(token: string): Promise<boolean> {
   try {
     const dot = token.lastIndexOf('.');
     if (dot === -1) return false;
     const body = token.slice(0, dot);
     const sig = token.slice(dot + 1);
-    const expected = createHmac('sha256', SECRET).update(body).digest('base64url');
-    if (sig !== expected) return false;
+    
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(SECRET),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+    
+    const isValid = await crypto.subtle.verify(
+      'HMAC',
+      key,
+      Buffer.from(sig, 'base64url'),
+      encoder.encode(body)
+    );
+    
+    if (!isValid) return false;
+    
     const payload = JSON.parse(Buffer.from(body, 'base64url').toString());
     return payload.exp > Date.now();
   } catch {
@@ -22,7 +34,7 @@ function verifyAdminToken(token: string): boolean {
   }
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/admin')) {
@@ -30,7 +42,7 @@ export function proxy(request: NextRequest) {
       return NextResponse.next();
     }
     const token = request.cookies.get('admin_token')?.value;
-    if (!token || !verifyAdminToken(token)) {
+    if (!token || !(await verifyAdminToken(token))) {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('from', pathname);
       return NextResponse.redirect(loginUrl);
@@ -38,9 +50,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  return intlMiddleware(request);
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/', '/(ar|en)/:path*'],
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };

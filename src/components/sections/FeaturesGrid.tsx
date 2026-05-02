@@ -19,11 +19,10 @@ export function FeaturesGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="md:row-span-2 rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden"
+            className="md:row-span-2 rounded-2xl p-5 md:p-8 flex flex-col justify-between relative overflow-hidden min-h-[280px] md:min-h-[340px]"
             style={{
               background: '#1A1A1A',
               border: '1px solid rgba(255,255,255,0.06)',
-              minHeight: '340px',
             }}
           >
             {/* Background accent */}
@@ -73,7 +72,7 @@ export function FeaturesGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="rounded-2xl p-7 relative overflow-hidden"
+            className="rounded-2xl p-5 md:p-7 relative overflow-hidden"
             style={{
               background: '#1A1A1A',
               border: '1px solid rgba(255,255,255,0.06)',
@@ -100,7 +99,7 @@ export function FeaturesGrid() {
               {cities.map((city, i) => (
                 <span
                   key={city}
-                  className="text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5"
+                  className="text-[12px] px-[14px] py-[7px] md:text-xs md:px-3 md:py-1.5 rounded-full font-medium flex items-center gap-1.5"
                   style={{
                     background: i === 0 ? 'rgba(204,255,0,0.12)' : 'rgba(255,255,255,0.05)',
                     color: i === 0 ? '#CCFF00' : '#888',
@@ -120,7 +119,7 @@ export function FeaturesGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="rounded-2xl p-7 relative overflow-hidden"
+            className="rounded-2xl p-5 md:p-7 relative overflow-hidden"
             style={{
               background: '#1A1A1A',
               border: '1px solid rgba(255,255,255,0.06)',
