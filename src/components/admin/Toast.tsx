@@ -27,9 +27,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const variantStyles: Record<ToastVariant, string> = {
-    success: 'bg-emerald-500',
-    error: 'bg-red-500',
-    info: 'bg-blue-500',
+    success: 'bg-[#CCFF00] text-[#0A0A0A]',
+    error: 'bg-red-500 text-white',
+    info: 'bg-blue-500 text-white',
   };
 
   const icons: Record<ToastVariant, string> = {
@@ -45,7 +45,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map(t => (
           <div
             key={t.id}
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm font-medium shadow-lg pointer-events-auto animate-in slide-in-from-right-4 ${variantStyles[t.variant]}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium shadow-lg pointer-events-auto animate-in slide-in-from-right-4 ${variantStyles[t.variant]}`}
           >
             <span className="font-bold">{icons[t.variant]}</span>
             {t.message}

@@ -15,7 +15,7 @@ const typeColors: Record<string, string> = {
   new_booking:   'bg-blue-500/10 text-blue-400',
   status_change: 'bg-purple-500/10 text-purple-400',
   payment:       'bg-emerald-500/10 text-emerald-400',
-  system:        'bg-gray-700 text-gray-400',
+  system:        'bg-white/[0.05] text-white/40',
 };
 
 export default function NotificationsPage() {
@@ -79,7 +79,7 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Notifications</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-white/50 text-sm mt-0.5">
             {unread.length > 0 ? `${unread.length} unread` : 'All caught up'}
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function NotificationsPage() {
           <button
             onClick={markAllRead}
             disabled={markingAll}
-            className="text-sm text-amber-400 hover:text-amber-300 transition-colors disabled:opacity-60"
+            className="text-sm text-[#CCFF00] hover:text-[#CCFF00]/80 transition-colors disabled:opacity-60"
           >
             Mark all read
           </button>
@@ -96,16 +96,16 @@ export default function NotificationsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#CCFF00] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : notifications.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl px-6 py-16 text-center">
-          <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center mx-auto mb-3">
-            <svg className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="bg-[#111111] border border-white/[0.08] rounded-xl px-6 py-16 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#1A1A1A] flex items-center justify-center mx-auto mb-3">
+            <svg className="w-6 h-6 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
           </div>
-          <p className="text-gray-400">No notifications yet</p>
+          <p className="text-white/40">No notifications yet</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -113,7 +113,7 @@ export default function NotificationsPage() {
             <div
               key={n.id}
               onClick={() => markOneRead(n.id)}
-              className={`flex gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${n.is_read ? 'bg-gray-900 border-gray-800 opacity-70 hover:opacity-100' : 'bg-gray-900 border-amber-500/20 hover:border-amber-500/40'}`}
+              className={`flex gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${n.is_read ? 'bg-[#111111] border-white/[0.08] opacity-60 hover:opacity-100' : 'bg-[#111111] border-[#CCFF00]/20 hover:border-[#CCFF00]/40'}`}
             >
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${typeColors[n.type] ?? typeColors.system}`}>
                 <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,12 +121,12 @@ export default function NotificationsPage() {
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm ${n.is_read ? 'text-gray-300' : 'text-white font-medium'}`}>{n.message}</p>
-                <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1.5">
+                <p className={`text-sm ${n.is_read ? 'text-white/60' : 'text-white font-medium'}`}>{n.message}</p>
+                <p className="text-xs text-white/30 mt-0.5 flex items-center gap-1.5">
                   <span className="capitalize">{n.type.replace('_', ' ')}</span>
                   <span>·</span>
                   <span>{formatTime(n.created_at)}</span>
-                  {!n.is_read && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />}
+                  {!n.is_read && <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] inline-block" />}
                 </p>
               </div>
             </div>

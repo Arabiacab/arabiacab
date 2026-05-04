@@ -3,6 +3,9 @@ export type PaymentMethod = 'cash' | 'online';
 export type PaymentStatus = 'pending' | 'paid' | 'refunded';
 export type ServiceType = 'standard' | 'airport' | 'tour' | 'rental';
 export type NotificationType = 'new_booking' | 'status_change' | 'payment';
+export type DriverStatus = 'available' | 'busy' | 'offline';
+export type InvoiceStatus = 'unpaid' | 'paid' | 'cancelled';
+export type CustomerTag = 'vip' | 'frequent' | 'risky' | 'new';
 
 export interface Booking {
   id: string;
@@ -23,8 +26,24 @@ export interface Booking {
   final_price?: number;
   notes?: string;
   admin_notes?: string;
+  driver_id?: string;
+  driver?: Driver;
+  priority?: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface Driver {
+  id: string;
+  name: string;
+  phone: string;
+  status: DriverStatus;
+  vehicle_type: string;
+  vehicle_plate?: string;
+  notes?: string;
+  is_active: boolean;
+  assigned_bookings?: number;
+  created_at: string;
 }
 
 export interface Customer {
@@ -35,6 +54,8 @@ export interface Customer {
   total_bookings: number;
   total_spent: number;
   is_vip: boolean;
+  tags?: CustomerTag[];
+  notes?: string;
   created_at: string;
 }
 
@@ -64,6 +85,36 @@ export interface AdminUser {
   role: string;
 }
 
+export interface ActivityLog {
+  id: string;
+  admin_id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  details?: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface Invoice {
+  id: string;
+  booking_id?: string;
+  invoice_number: string;
+  customer_name: string;
+  customer_email?: string;
+  customer_phone: string;
+  service_type?: string;
+  pickup_location?: string;
+  dropoff_location?: string;
+  amount: number;
+  tax_rate: number;
+  tax_amount?: number;
+  total_amount: number;
+  status: InvoiceStatus;
+  notes?: string;
+  created_at: string;
+  paid_at?: string;
+}
+
 export interface DashboardStats {
   today_bookings: number;
   week_bookings: number;
@@ -74,8 +125,11 @@ export interface DashboardStats {
   confirmed_count: number;
   completed_count: number;
   cancelled_count: number;
+  in_progress_count: number;
   top_routes: { pickup: string; dropoff: string; count: number }[];
   recent_bookings: Booking[];
+  peak_hours: { hour: number; count: number }[];
+  revenue_by_service: { service_type: string; revenue: number; count: number }[];
 }
 
 export interface BookingFilters {
@@ -83,8 +137,22 @@ export interface BookingFilters {
   date_from?: string;
   date_to?: string;
   search?: string;
+  service_type?: ServiceType;
+  payment_method?: PaymentMethod;
+  payment_status?: PaymentStatus;
+  driver_id?: string;
+  price_min?: number;
+  price_max?: number;
   page?: number;
   limit?: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }
 
 export interface ApiResponse<T> {

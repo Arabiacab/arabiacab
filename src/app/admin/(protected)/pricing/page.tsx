@@ -95,7 +95,7 @@ export default function PricingPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#CCFF00] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -104,25 +104,25 @@ export default function PricingPage() {
     <div className="space-y-5 max-w-3xl">
       <div>
         <h1 className="text-2xl font-bold text-white">Pricing</h1>
-        <p className="text-gray-400 text-sm mt-0.5">Manage service rates (SAR)</p>
+        <p className="text-white/50 text-sm mt-0.5">Manage service rates (SAR)</p>
       </div>
 
       <div className="space-y-4">
         {rules.map(rule => {
           const isEditing = editing === rule.id;
           return (
-            <div key={rule.id} className={`bg-gray-900 border rounded-xl overflow-hidden transition-colors ${isEditing ? 'border-amber-500/40' : 'border-gray-800'}`}>
+            <div key={rule.id} className={`bg-[#111111] border rounded-xl overflow-hidden transition-colors ${isEditing ? 'border-[#CCFF00]/30' : 'border-white/[0.08]'}`}>
               <div className="flex items-center justify-between px-6 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-10 h-10 rounded-lg bg-[#CCFF00]/10 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-[#CCFF00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={serviceIcons[rule.service_type] ?? serviceIcons.standard} />
                     </svg>
                   </div>
                   <div>
                     <p className="font-semibold text-white">{serviceLabels[rule.service_type] ?? rule.service_type}</p>
                     {!isEditing && (
-                      <p className="text-gray-400 text-xs mt-0.5">
+                      <p className="text-white/40 text-xs mt-0.5">
                         SAR {rule.base_price} base
                         {rule.price_per_km != null && ` · SAR ${rule.price_per_km}/km`}
                         {rule.minimum_price != null && ` · min SAR ${rule.minimum_price}`}
@@ -132,29 +132,29 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   {!isEditing && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${rule.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-700 text-gray-400'}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${rule.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/[0.05] text-white/30'}`}>
                       {rule.is_active ? 'Active' : 'Inactive'}
                     </span>
                   )}
                   {isEditing ? (
                     <div className="flex gap-2">
-                      <button onClick={cancelEdit} className="px-3 py-1.5 rounded-lg text-xs bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors">Cancel</button>
+                      <button onClick={cancelEdit} className="px-3 py-1.5 rounded-lg text-xs bg-[#1A1A1A] text-white/70 hover:bg-white/[0.08] transition-colors">Cancel</button>
                       <button
                         onClick={() => saveEdit(rule)}
                         disabled={saving}
-                        className="px-3 py-1.5 rounded-lg text-xs bg-amber-500 text-gray-900 font-semibold hover:bg-amber-400 transition-colors disabled:opacity-60"
+                        className="px-3 py-1.5 rounded-lg text-xs bg-[#CCFF00] text-[#0A0A0A] font-semibold hover:bg-[#CCFF00]/90 transition-colors disabled:opacity-60"
                       >
                         {saving ? 'Saving…' : 'Save'}
                       </button>
                     </div>
                   ) : (
-                    <button onClick={() => startEdit(rule)} className="px-3 py-1.5 rounded-lg text-xs bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Edit</button>
+                    <button onClick={() => startEdit(rule)} className="px-3 py-1.5 rounded-lg text-xs bg-[#1A1A1A] text-white/70 hover:bg-white/[0.08] hover:text-white transition-colors">Edit</button>
                   )}
                 </div>
               </div>
 
               {isEditing && editState && (
-                <div className="px-6 pb-5 grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-gray-800 pt-4">
+                <div className="px-6 pb-5 grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-white/[0.08] pt-4">
                   <Field
                     label="Base Price (SAR)"
                     value={editState.base_price}
@@ -177,11 +177,11 @@ export default function PricingPage() {
                     placeholder="optional"
                   />
                   <div className="flex items-center gap-3 col-span-full">
-                    <label className="text-sm text-gray-300 flex items-center gap-2 cursor-pointer select-none">
+                    <label className="text-sm text-white/70 flex items-center gap-2 cursor-pointer select-none">
                       <button
                         type="button"
                         onClick={() => setEditState(s => s ? { ...s, is_active: !s.is_active } : s)}
-                        className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${editState.is_active ? 'bg-emerald-500' : 'bg-gray-700'}`}
+                        className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${editState.is_active ? 'bg-emerald-500' : 'bg-white/10'}`}
                       >
                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition mt-0.5 ${editState.is_active ? 'translate-x-4' : 'translate-x-0.5'}`} />
                       </button>
@@ -204,7 +204,7 @@ function Field({ label, value, onChange, type = 'text', placeholder, required }:
 }) {
   return (
     <div>
-      <label className="block text-xs text-gray-400 mb-1.5">{label}{required && <span className="text-amber-400 ml-0.5">*</span>}</label>
+      <label className="block text-xs text-white/40 mb-1.5">{label}{required && <span className="text-[#CCFF00] ml-0.5">*</span>}</label>
       <input
         type={type}
         value={value}
@@ -212,7 +212,7 @@ function Field({ label, value, onChange, type = 'text', placeholder, required }:
         placeholder={placeholder}
         min={0}
         step="0.01"
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+        className="w-full bg-[#1A1A1A] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[#CCFF00]"
       />
     </div>
   );

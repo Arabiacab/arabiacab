@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getBookingById, updateBooking, createNotification } from '@/lib/db';
+import { getBookingById, updateBooking, createNotification, logActivity } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 
 function requireAdmin(request: NextRequest): boolean {
@@ -35,5 +35,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     message: `Booking ${booking.booking_ref} status changed to ${status}`,
   });
 
+  await logActivity('status_changed', 'booking', id, { status, reason });
   return NextResponse.json({ success: true, data: booking });
 }

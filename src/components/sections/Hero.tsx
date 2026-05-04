@@ -132,6 +132,7 @@ export function Hero({ isMainPage = true }: { isMainPage?: boolean }) {
               width={320}
               height={96}
               className="h-24 w-auto"
+              style={{ height: 'auto' }}
               priority
             />
           </Link>
