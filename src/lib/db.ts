@@ -211,8 +211,10 @@ export async function updateCustomer(id: string, updates: Partial<Customer>): Pr
 
 // ─── INVOICES ─────────────────────────────────────────────────────────────────
 
-export async function getInvoices(): Promise<Invoice[]> {
-  const { data, error } = await db().from('invoices').select('*').order('created_at', { ascending: false });
+export async function getInvoices(booking_id?: string): Promise<Invoice[]> {
+  let q = db().from('invoices').select('*').order('created_at', { ascending: false });
+  if (booking_id) q = q.eq('booking_id', booking_id);
+  const { data, error } = await q;
   if (error) throw error;
   return (data ?? []) as Invoice[];
 }

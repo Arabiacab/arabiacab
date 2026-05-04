@@ -9,7 +9,8 @@ function requireAdmin(request: NextRequest): boolean {
 
 export async function GET(request: NextRequest) {
   if (!requireAdmin(request)) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-  const invoices = await getInvoices();
+  const booking_id = request.nextUrl.searchParams.get('booking_id') ?? undefined;
+  const invoices = await getInvoices(booking_id);
   return NextResponse.json({ success: true, data: invoices });
 }
 

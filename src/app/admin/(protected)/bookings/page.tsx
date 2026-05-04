@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import type { Booking, BookingStatus, Driver } from '@/types';
+import type { Booking, BookingStatus, Driver, Invoice } from '@/types';
 import { useToast } from '@/components/admin/Toast';
 
 const statusColors: Record<BookingStatus, string> = {
@@ -64,6 +64,10 @@ export default function BookingsPage() {
   const [showDriverModal, setShowDriverModal] = useState(false);
   const [adminNotes, setAdminNotes]         = useState('');
   const [savingNotes, setSavingNotes]       = useState(false);
+  const [invoiceBooking, setInvoiceBooking] = useState<Booking | null>(null);
+  const [invoice, setInvoice]               = useState<Invoice | null>(null);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
+  const [invoiceCreating, setInvoiceCreating] = useState(false);
   const searchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const advancedCount = [dateFrom, dateTo, serviceType, paymentMethod, paymentStatus, priceMin, priceMax].filter(Boolean).length;
@@ -180,6 +184,42 @@ export default function BookingsPage() {
     });
     const d = await res.json();
     if (d.success) { toast(driverId ? 'Driver assigned' : 'Driver removed'); fetchBookings(page); setSelected(d.data); }
+    else toast(d.error ?? 'Failed', 'error');
+  }
+
+  async function openInvoice(b: Booking) {
+    setInvoiceBooking(b);
+    setInvoice(null);
+    setInvoiceLoading(true);
+    try {
+      const res = await fetch(`/api/invoices?booking_id=${b.id}`);
+      const d = await res.json();
+      if (d.success && d.data.length > 0) setInvoice(d.data[0]);
+    } finally { setInvoiceLoading(false); }
+  }
+
+  async function createInvoice() {
+    if (!invoiceBooking) return;
+    setInvoiceCreating(true);
+    try {
+      const res = await fetch('/api/invoices', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ booking_id: invoiceBooking.id }),
+      });
+      const d = await res.json();
+      if (d.success) { setInvoice(d.data); toast('Invoice created'); }
+      else toast(d.error ?? 'Failed to create invoice', 'error');
+    } finally { setInvoiceCreating(false); }
+  }
+
+  async function markInvoicePaid() {
+    if (!invoice) return;
+    const res = await fetch(`/api/invoices/${invoice.id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'mark_paid' }),
+    });
+    const d = await res.json();
+    if (d.success) { setInvoice(d.data); toast('Invoice marked as paid'); }
     else toast(d.error ?? 'Failed', 'error');
   }
 
@@ -387,9 +427,28 @@ export default function BookingsPage() {
                           </select>
                         </td>
                         <td className="px-4 py-3">
-                          <button onClick={() => { setSelected(b); setAdminNotes(b.admin_notes ?? ''); }} className="text-xs text-white/40 hover:text-white underline transition-colors">
-                            View
-                          </button>
+                          <div className="flex items-center gap-1">
+                            {/* Edit */}
+                            <button onClick={() => { setSelected(b); setAdminNotes(b.admin_notes ?? ''); }} title="Edit booking"
+                              className="p-1.5 rounded-lg text-blue-400 hover:bg-blue-500/10 transition-colors">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            </button>
+                            {/* View Invoice */}
+                            <button onClick={() => openInvoice(b)} title="View invoice"
+                              className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            </button>
+                            {/* Create Invoice */}
+                            <button onClick={() => { setInvoiceBooking(b); setInvoice(null); setInvoiceLoading(false); }} title="Create invoice"
+                              className="p-1.5 rounded-lg text-purple-400 hover:bg-purple-500/10 transition-colors">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            </button>
+                            {/* Cancel */}
+                            <button onClick={() => { setSelected(b); setShowCancelModal(true); }} title="Cancel booking"
+                              className="p-1.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -498,6 +557,96 @@ export default function BookingsPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invoice modal */}
+      {invoiceBooking && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setInvoiceBooking(null)}>
+          <div className="bg-[#111111] border border-white/[0.08] rounded-2xl w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08]">
+              <div>
+                <h3 className="font-semibold text-white">Invoice — #{invoiceBooking.booking_ref}</h3>
+                <p className="text-white/40 text-xs mt-0.5">{invoiceBooking.customer_name}</p>
+              </div>
+              <button onClick={() => setInvoiceBooking(null)} className="text-white/30 hover:text-white text-lg">✕</button>
+            </div>
+
+            {invoiceLoading ? (
+              <div className="px-6 py-12 text-center text-white/40 text-sm">Loading…</div>
+            ) : invoice ? (
+              <div className="px-6 py-4 space-y-4">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-[#1A1A1A] rounded-lg p-3">
+                    <p className="text-white/40 text-xs mb-1">Invoice #</p>
+                    <p className="text-[#CCFF00] font-mono text-sm">{invoice.invoice_number}</p>
+                  </div>
+                  <div className="bg-[#1A1A1A] rounded-lg p-3">
+                    <p className="text-white/40 text-xs mb-1">Status</p>
+                    <span className={`text-xs font-semibold capitalize px-2 py-0.5 rounded ${invoice.status === 'paid' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-yellow-500/10 text-yellow-400'}`}>
+                      {invoice.status}
+                    </span>
+                  </div>
+                  <div className="bg-[#1A1A1A] rounded-lg p-3">
+                    <p className="text-white/40 text-xs mb-1">Amount</p>
+                    <p className="text-white text-sm font-medium">SAR {invoice.amount?.toFixed(2)}</p>
+                  </div>
+                  <div className="bg-[#1A1A1A] rounded-lg p-3">
+                    <p className="text-white/40 text-xs mb-1">VAT (15%)</p>
+                    <p className="text-white text-sm font-medium">SAR {invoice.tax_amount?.toFixed(2)}</p>
+                  </div>
+                </div>
+                <div className="bg-[#CCFF00]/5 border border-[#CCFF00]/20 rounded-lg p-4 flex items-center justify-between">
+                  <p className="text-white/70 text-sm font-medium">Total Amount</p>
+                  <p className="text-[#CCFF00] text-xl font-bold">SAR {invoice.total_amount?.toFixed(2)}</p>
+                </div>
+                {invoice.status !== 'paid' && (
+                  <button onClick={markInvoicePaid}
+                    className="w-full px-4 py-2.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 rounded-lg text-sm font-semibold transition-colors">
+                    Mark as Paid
+                  </button>
+                )}
+                {invoice.paid_at && (
+                  <p className="text-white/30 text-xs text-center">Paid on {new Date(invoice.paid_at).toLocaleDateString()}</p>
+                )}
+              </div>
+            ) : (
+              <div className="px-6 py-6 space-y-4">
+                <div className="bg-[#1A1A1A] rounded-xl p-4 text-sm space-y-2">
+                  <div className="flex justify-between text-white/60">
+                    <span>Service</span><span className="capitalize">{invoiceBooking.service_type}</span>
+                  </div>
+                  <div className="flex justify-between text-white/60">
+                    <span>Amount</span>
+                    <span>{invoiceBooking.final_price ?? invoiceBooking.price_estimate
+                      ? `SAR ${(invoiceBooking.final_price ?? invoiceBooking.price_estimate)?.toFixed(2)}`
+                      : <span className="text-yellow-400">No price set</span>}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-white/40 text-xs border-t border-white/[0.06] pt-2">
+                    <span>VAT 15%</span>
+                    <span>SAR {(((invoiceBooking.final_price ?? invoiceBooking.price_estimate) ?? 0) * 0.15).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-[#CCFF00] font-semibold border-t border-white/[0.06] pt-2">
+                    <span>Total</span>
+                    <span>SAR {(((invoiceBooking.final_price ?? invoiceBooking.price_estimate) ?? 0) * 1.15).toFixed(2)}</span>
+                  </div>
+                </div>
+                {!(invoiceBooking.final_price ?? invoiceBooking.price_estimate) && (
+                  <p className="text-yellow-400 text-xs bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-3 py-2">
+                    No price set on this booking. Set a price first in Edit.
+                  </p>
+                )}
+                <div className="flex gap-3">
+                  <button onClick={() => setInvoiceBooking(null)} className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#1A1A1A] text-white/70 hover:bg-white/[0.08] transition-colors">Cancel</button>
+                  <button onClick={createInvoice} disabled={invoiceCreating || !(invoiceBooking.final_price ?? invoiceBooking.price_estimate)}
+                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-[#CCFF00] text-[#0A0A0A] font-semibold hover:bg-[#CCFF00]/90 transition-colors disabled:opacity-50">
+                    {invoiceCreating ? 'Creating…' : 'Create Invoice'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
