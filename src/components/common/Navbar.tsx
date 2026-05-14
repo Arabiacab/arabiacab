@@ -45,7 +45,7 @@ export function Navbar() {
             alt="ArabiaCab Logo"
             width={360}
             height={108}
-            className="h-[26px] md:h-[32px] w-auto object-contain"
+            className="h-[20px] md:h-[26px] w-auto object-contain"
             style={{ width: 'auto' }}
             priority
           />
@@ -98,7 +98,7 @@ export function Navbar() {
             {/* Header row */}
             <div className="flex items-center justify-between px-5 h-[72px] border-b border-[rgba(255,255,255,0.08)] shrink-0">
               <Link href="/" className="flex items-center shrink-0" onClick={() => setIsMobileMenuOpen(false)}>
-                <Image src="/logo.png" alt="ArabiaCab Logo" width={360} height={108} className="h-[26px] w-auto object-contain" style={{ width: 'auto' }} />
+                <Image src="/logo.png" alt="ArabiaCab Logo" width={360} height={108} className="h-[20px] w-auto object-contain" style={{ width: 'auto' }} />
               </Link>
               <button
                 className="flex items-center justify-center text-white"
