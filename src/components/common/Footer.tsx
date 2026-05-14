@@ -43,8 +43,7 @@ export function Footer() {
                 alt="ArabiaCab Logo"
                 width={320}
                 height={96}
-                className="h-24 w-auto"
-                style={{ height: 'auto' }}
+                className="h-[32px] w-auto object-contain"
               />
             </Link>
             <p className="text-[#666] text-sm leading-relaxed max-w-[280px] mb-6">
